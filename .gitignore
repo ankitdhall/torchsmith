@@ -20,6 +20,7 @@
 coverage*
 # But keep .coveragerc
 !.coveragerc
+!.badges/*
 
 # Profiling
 profile*.html
