@@ -10,6 +10,7 @@
 # Distribution / packaging
 **/__pycache__
 *.egg-info/
+build
 
 # Storage Files
 *.npy
@@ -18,7 +19,7 @@
 # Unit test / coverage reports
 .coverage*
 coverage*
-# But keep .coveragerc
+# But keep .coveragerc and badges
 !.coveragerc
 !.badges/*
 
