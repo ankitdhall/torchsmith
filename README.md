@@ -335,10 +335,10 @@ Of wift be my kimery arm thing fair dre
 git clone https://github.com/ankitdhall/torchsmith.git
 
 # Option 1: Install using uv
-uv pip install torchsmith
+uv pip install ./torchsmith
 
 # Option 2: Install using pip
-pip install torchsmith
+pip install ./torchsmith
 ```
 
 ---
@@ -394,12 +394,21 @@ plot_images(
 Torchsmith strives for test-driven development and uses `pytest` for testing.
 The tests cover most of the codebase.
 
+First install packages needed for testing:
+```bash
+# Option 1: Install using uv
+uv pip install ./torchsmith[testing]
+
+# Option 2: Install using pip
+pip install ./torchsmith[testing]
+```
+
 To run the tests:
 ```bash
 pytest tests/
 ```
 
-To generate the coverage badge:
+To generate and save (saved to `.badges/`) the test coverage badge run:
 ```bash
 ./scripts/generate_badges.sh
 ```

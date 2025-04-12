@@ -40,5 +40,5 @@ testing = [
     "pytest-cov>=6.0.0",
     "pyinstrument>=5.0.1",
     "memray>=1.15.0",
-    "genbadge>1.1.2",
+    "genbadge[coverage]>=1.1.2",
 ]
