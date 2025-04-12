@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=75.8.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+
+[project]
+name = "torchsmith"
+version = "0.1.0"
+description = "Torchsmith package"
+authors = [
+    { name = "Ankit Dhall" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.4.1",
+    "torchvision>=0.19.1",
+    "einops>=0.8.0",
+    "datasets>=3.3.2",
+    "pre-commit>=4.1.0",
+    "matplotlib>=3.10.0",
+    "joblib>=1.4.2",
+    "psutil>=7.0.0",
+    "huggingface_hub>=0.29.1"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.urls]
+homepage = "https://github.com/ankitdhall/torchsmith"
+
+
+[project.optional-dependencies]
+testing = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pyinstrument>=5.0.1",
+    "memray>=1.15.0",
+    "genbadge>1.1.2",
+]

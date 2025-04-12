@@ -1,0 +1,25 @@
+# Environments
+.venv
+
+# Data
+/data/
+
+# IDE
+.idea
+
+# Distribution / packaging
+**/__pycache__
+*.egg-info/
+
+# Storage Files
+*.npy
+*.h5
+
+# Unit test / coverage reports
+.coverage*
+coverage*
+# But keep .coveragerc
+!.coveragerc
+
+# Profiling
+profile*.html
