@@ -1,6 +1,6 @@
 <p align="center">
   <picture>
-    <img alt="torchsmith" src="assets/torchsmith_logo.jpg" width="350">
+    <img alt="torchsmith" src="assets/torchsmith_logo_small.jpg" width="350">
   </picture>
 </p>
 <p align="center">
