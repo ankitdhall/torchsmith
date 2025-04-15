@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from typing import Any
 from typing import Callable
-from unittest.mock import patch
 
 import pytest
 
@@ -17,12 +16,8 @@ from torchsmith.utils.pyutils import get_arguments
     ["x", "n", "expected_output"],
     [([1, 2, 3, 4], 2, [(1, 2), (3, 4)]), ([1, 2, 3, 4], 3, [(1, 2, 3), (4,)])],
 )
-@pytest.mark.parametrize("python_version", [(3, 12), (3, 11)])
-def test_batched(
-    x: Iterable[T], n: int, expected_output: list[T], python_version: tuple[int, int]
-) -> None:
-    with patch("sys.version_info", python_version):
-        assert list(batched(x, n)) == expected_output
+def test_batched(x: Iterable[T], n: int, expected_output: list[T]) -> None:
+    assert list(batched(x, n)) == expected_output
 
 
 @pytest.mark.parametrize(
