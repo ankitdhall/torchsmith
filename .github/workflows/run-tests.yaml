@@ -1,4 +1,4 @@
-name: Run tests and generate coverage badge
+name: Run tests
 
 on:
   push:
@@ -26,7 +26,6 @@ jobs:
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Create virtual environment
         run: |
@@ -34,14 +33,9 @@ jobs:
 
       - name: Install torchsmith and testing dependencies
         run: |
-          uv pip install .
           uv pip install .[testing]
 
       - name: Run tests
         run: |
-          python --version
-          python -c "import sys; print(sys.version)"
           source .venv/bin/activate
-          python --version
-          python -c "import sys; print(sys.version)"
           pytest tests/
