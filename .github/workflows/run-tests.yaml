@@ -39,9 +39,9 @@ jobs:
 
       - name: Run tests and generate coverage badge
         run: |
-          echo python --version
+          python --version
           python -c "import sys; print(sys.version)"
           source .venv/bin/activate
-          echo python --version
+          python --version
           python -c "import sys; print(sys.version)"
           pytest tests/

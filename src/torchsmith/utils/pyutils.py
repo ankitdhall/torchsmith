@@ -18,6 +18,7 @@ from torchsmith.utils.dtypes import Y
 
 
 def batched(iterable: Iterable[T], n: int) -> Iterator[tuple[T, ...]]:
+    print(f"\n\n\nsys.version_info: {sys.version_info}")
     if sys.version_info >= (3, 12):
         from itertools import batched as itertools_batched
 
