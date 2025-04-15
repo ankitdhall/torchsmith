@@ -30,8 +30,8 @@ jobs:
 
       - name: Create virtual environment
         run: |
-          uv venv venv
-          source venv/bin/activate
+          uv venv
+          source .venv/bin/activate
 
       - name: Install torchsmith and testing dependencies
         run: |
