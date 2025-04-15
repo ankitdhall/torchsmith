@@ -37,7 +37,7 @@ jobs:
           uv pip install .
           uv pip install .[testing]
 
-      - name: Run tests and generate coverage badge
+      - name: Run tests
         run: |
           python --version
           python -c "import sys; print(sys.version)"
