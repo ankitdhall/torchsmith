@@ -31,7 +31,6 @@ jobs:
       - name: Create virtual environment
         run: |
           uv venv
-          source .venv/bin/activate
 
       - name: Install torchsmith and testing dependencies
         run: |
@@ -39,7 +38,9 @@ jobs:
           uv pip install .[testing]
 
       - name: Run tests and generate coverage badge
-        run: ./scripts/generate_badges.sh
+        run: |
+          source .venv/bin/activate
+          ./scripts/generate_badges.sh
 
       - name: Upload coverage badge as artifact
         if: matrix.python-version == '3.13'
