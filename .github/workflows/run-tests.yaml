@@ -29,7 +29,9 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Create virtual environment
-        run: uv venv
+        run: |
+          uv venv
+          source venv/bin/activate
 
       - name: Install torchsmith and testing dependencies
         run: |
