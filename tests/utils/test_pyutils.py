@@ -16,9 +16,7 @@ from torchsmith.utils.pyutils import get_arguments
     ["x", "n", "expected_output"],
     [([1, 2, 3, 4], 2, [(1, 2), (3, 4)]), ([1, 2, 3, 4], 3, [(1, 2, 3), (4,)])],
 )
-def test_batched(
-    x: Iterable[T], n: int, expected_output: list[T], python_version: tuple[int, int]
-) -> None:
+def test_batched(x: Iterable[T], n: int, expected_output: list[T]) -> None:
     assert list(batched(x, n)) == expected_output
 
 
