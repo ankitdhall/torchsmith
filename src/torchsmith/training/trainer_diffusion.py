@@ -10,6 +10,7 @@ from torchsmith.models.diffusion.diffusion import DiffusionModel
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.scheduler import get_scheduler
+from torchsmith.training.scheduler.base import BaseScheduler
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()
@@ -110,15 +111,18 @@ class DiffusionTrainer:
             lr=self.train_config.optimizer_config.lr,
             weight_decay=self.train_config.optimizer_config.weight_decay,
         )
-        self.scheduler = get_scheduler(
-            self.train_config.scheduler_config,
-            optimizer=self.optimizer,
-            epochs=self.train_config.num_epochs,
-            num_batches_per_epoch=self.num_batches_per_epoch,
-            dataset_len=self.train_dataset_len,
-            batch_size=self.train_config.batch_size,
-        )
-        if self.show_plots:
+        if self.train_config.scheduler_config is not None:
+            self.scheduler: BaseScheduler | None = get_scheduler(
+                self.train_config.scheduler_config,
+                optimizer=self.optimizer,
+                epochs=self.train_config.num_epochs,
+                num_batches_per_epoch=self.num_batches_per_epoch,
+                dataset_len=self.train_dataset_len,
+                batch_size=self.train_config.batch_size,
+            )
+        else:
+            self.scheduler = None
+        if self.show_plots and self.scheduler is not None:
             self.scheduler.visualize()
 
     def train(self) -> tuple:
@@ -217,19 +221,21 @@ class DiffusionTrainer:
             lr=self.train_config.optimizer_config.lr,
             weight_decay=self.train_config.optimizer_config.weight_decay,
         )
-        self.scheduler = get_scheduler(
-            self.train_config.scheduler_config,
-            optimizer=self.optimizer,
-            epochs=self.train_config.num_epochs,
-            num_batches_per_epoch=self.num_batches_per_epoch,
-            train_dataset_len=self.train_dataset_len,
-            batch_size=self.train_config.batch_size,
-        )
+        if self.train_config.scheduler_config is not None:
+            self.scheduler = get_scheduler(
+                self.train_config.scheduler_config,
+                optimizer=self.optimizer,
+                epochs=self.train_config.num_epochs,
+                num_batches_per_epoch=self.num_batches_per_epoch,
+                train_dataset_len=self.train_dataset_len,
+                batch_size=self.train_config.batch_size,
+            )
 
         optimizer_state = torch.load(dir_to_load / "optimizer.pth", weights_only=False)
         self._epoch = optimizer_state["epoch"]
         self.optimizer.load_state_dict(optimizer_state["optimizer_state_dict"])
-        self.scheduler.load_state_dict(optimizer_state["scheduler_state_dict"])
+        if self.scheduler is not None:
+            self.scheduler.load_state_dict(optimizer_state["scheduler_state_dict"])
         for param_group in self.optimizer.param_groups:
             print(f"Resuming with learning rate: {param_group['lr']}")
         print(f"Loaded trainer from {dir_to_load}")

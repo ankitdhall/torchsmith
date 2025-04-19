@@ -22,7 +22,7 @@ class TrainConfig:
     num_epochs: int = 100
     num_workers: int = 2
     optimizer_config: OptimizerConfig = dataclasses.field(default_factory=AdamConfig)
-    scheduler_config: SchedulerConfig = dataclasses.field(
+    scheduler_config: SchedulerConfig | None = dataclasses.field(
         default_factory=CosineWarmupSchedulerConfig
     )
     # TODO: include scheduler and optimizer creation as part of this class?
