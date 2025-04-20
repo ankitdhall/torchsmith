@@ -181,7 +181,7 @@ class VAETrainer:
     def save_state(self, epoch: int) -> None:
         dir_to_save = self.save_dir / f"epoch_{epoch}"
         dir_to_save.mkdir(parents=True)
-        self.model.model.save_model(dir_to_save / "model.pth")
+        self.model.save_model(dir_to_save / "model.pth")
         data = {
             "epoch": self._epoch,
             "optimizer_state_dict": self.optimizer.state_dict(),
@@ -201,9 +201,7 @@ class VAETrainer:
             ]
         )[-1]
         dir_to_load = self.save_dir / f"epoch_{latest_epoch}"
-        self.model.model = self.model.model.load_model(dir_to_load / "model.pth").to(
-            device
-        )
+        self.model = self.model.load_model(dir_to_load / "model.pth").to(device)
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             lr=self.train_config.optimizer_config.lr,
