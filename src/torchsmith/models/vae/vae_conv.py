@@ -7,6 +7,7 @@ from torch.nn import functional as F
 
 from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.base import reparameterize
+from torchsmith.utils.pytorch import add_save_load
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()
@@ -81,6 +82,7 @@ class DecoderConv(nn.Module):
         return self.model(fc_output)
 
 
+@add_save_load
 class VAEConv(BaseVAE):
     def __init__(
         self,

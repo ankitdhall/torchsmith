@@ -4,14 +4,11 @@ from abc import abstractmethod
 import numpy as np
 import torch
 
-from torchsmith.utils.pytorch import add_save_load
-
 
 def reparameterize(mu: torch.Tensor, log_std: torch.Tensor) -> torch.Tensor:
     return mu + torch.exp(log_std) * torch.randn_like(mu)
 
 
-@add_save_load
 class BaseVAE(ABC, torch.nn.Module):
     @abstractmethod
     def forward(

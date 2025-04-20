@@ -6,6 +6,7 @@ from torch.distributions import kl_divergence
 
 from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.base import reparameterize
+from torchsmith.utils.pytorch import add_save_load
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()
@@ -41,6 +42,7 @@ class MLP(nn.Module):
         return output.reshape(-1, *self.output_shape)
 
 
+@add_save_load
 class VAE1D(BaseVAE):
     def __init__(
         self,

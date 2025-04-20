@@ -20,6 +20,7 @@ def generate_samples(
 
 
 def generate_reconstructions(
+    *,
     num_samples: int,
     model: VAEConv,
     dataloader: torch.utils.data.DataLoader,
