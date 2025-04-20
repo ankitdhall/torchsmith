@@ -1,3 +1,4 @@
+import huggingface_hub
 import numpy as np
 import pytest
 import torch
@@ -139,3 +140,19 @@ def test_generate_interpolations() -> None:
             num_steps=num_steps,
         )
     assert samples.shape == torch.Size([num_steps * num_samples, *input_shape])
+
+
+def test_VAEConv_sample_from_loaded_model() -> None:
+    path_to_weights = huggingface_hub.hf_hub_download(
+        "ankitdhall/svhn_vae", filename="model.pth"
+    )
+    vae = VAEConv.load_model(path_to_weights).to(device)
+
+    num_samples = 100
+    input_shape = (3, 32, 32)
+    with suppress_plot():
+        pass
+    samples = generate_samples(
+        vae, num_samples=num_samples, postprocess_fn=postprocess_data
+    )
+    assert samples.shape == torch.Size([num_samples, *input_shape])
