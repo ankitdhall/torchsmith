@@ -17,7 +17,12 @@ def plot_samples(
 ):
     if images.ndim != 4:
         raise ValueError(
-            f"`images` must be of shape (B, C, H, W) but found {images.shape}"
+            f"`images` must be of shape (B, C, H, W) but found: {images.shape}"
+        )
+    if images.shape[1] not in [1, 3]:
+        raise ValueError(
+            f"`images` must be of shape (B, C, H, W) with 1 or 3 channels "
+            f"but found: {images.shape}"
         )
     if np.max(images) > 255 or np.min(images) < 0:
         warnings.warn(
