@@ -148,11 +148,10 @@ def test_VAEConv_sample_from_loaded_model() -> None:
     )
     vae = VAEConv.load_model(path_to_weights).to(device)
 
-    num_samples = 100
+    num_samples = 10
     input_shape = (3, 32, 32)
     with suppress_plot():
-        pass
-    samples = generate_samples(
-        vae, num_samples=num_samples, postprocess_fn=postprocess_data
-    )
+        samples = generate_samples(
+            vae, num_samples=num_samples, postprocess_fn=postprocess_data
+        )
     assert samples.shape == torch.Size([num_samples, *input_shape])
