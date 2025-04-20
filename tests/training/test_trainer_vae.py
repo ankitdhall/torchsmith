@@ -43,8 +43,7 @@ def test_VAE1D() -> None:
         decoder_hidden_dims=hidden_dims,
     )
     input = torch.randn((5, 2))
-    x_reconstructed, mu_z, log_var_z, mu_x, log_var_x = vae(input)
-    assert x_reconstructed.shape == torch.Size([5, input_dim])
+    mu_z, log_var_z, mu_x, log_var_x = vae(input)
     assert mu_z.shape == torch.Size([5, latent_dim])
     assert log_var_z.shape == torch.Size([5, latent_dim])
     assert mu_x.shape == torch.Size([5, input_dim])

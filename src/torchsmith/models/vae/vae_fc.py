@@ -76,7 +76,7 @@ class VAE1D(BaseVAE):
         self, x: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         mu_z, log_std_z = self.encode(x)
-        z = self.reparameterize(mu_z, log_std_z)
+        z = reparameterize(mu_z, log_std_z)
         mu_x, log_std_x = self.decode(z)
         return mu_z, log_std_z, mu_x, log_std_x
 

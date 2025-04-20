@@ -43,7 +43,7 @@ test_dataloader = DataLoader(
 model = VAEConv((3, 32, 32), latent_dim=16).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-experiment_dir = EXPERIMENT_DIR / "vae_svhn_diffusion"
+experiment_dir = EXPERIMENT_DIR / "svhn_vae"
 print(f"Saving experiment to: {experiment_dir}")
 
 data_handler = DataHandler(
@@ -58,7 +58,7 @@ trainer = VAETrainer(
     generate_samples_fn=partial(generate_samples, postprocess_fn=postprocess_data),
     sample_every_n_epochs=10000,
     save_dir=experiment_dir,
-    save_every_n_epochs=1000,
+    save_every_n_epochs=10000,
 )
 model, train_losses, test_losses, _ = trainer.train()
 print("Done!")
