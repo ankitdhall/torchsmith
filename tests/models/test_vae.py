@@ -142,10 +142,15 @@ def test_generate_interpolations() -> None:
     assert samples.shape == torch.Size([num_steps * num_samples, *input_shape])
 
 
-def test_VAEConv_sample_from_loaded_model() -> None:
-    path_to_weights = huggingface_hub.hf_hub_download(
-        "ankitdhall/svhn_vae", filename="model.pth"
-    )
+@pytest.mark.parametrize(
+    "model_path",
+    [
+        "ankitdhall/svhn_vae",
+        "ankitdhall/colored_mnist_vae",
+    ],
+)
+def test_VAEConv_sample_from_loaded_model(model_path: str) -> None:
+    path_to_weights = huggingface_hub.hf_hub_download(model_path, filename="model.pth")
     vae = VAEConv.load_model(path_to_weights).to(device)
 
     num_samples = 10
