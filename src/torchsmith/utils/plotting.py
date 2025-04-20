@@ -84,12 +84,22 @@ def darken_fraction_of_image(
 
 
 def plot_losses(
-    train_losses: list[float],
+    train_losses: list[float] | list[np.ndarray],
     *,
-    test_losses: list[float],
+    test_losses: list[float] | list[np.ndarray],
     save_dir: Path | None = None,
     show: bool = False,
+    labels: str | list[str] = "Loss",
 ) -> None:
+    assert type(train_losses[0]) is type(test_losses[0])
+    if isinstance(labels, str):
+        label_train: str | list[str] = f"Train {labels}"
+        label_test: str | list[str] = f"Test {labels}"
+    if isinstance(train_losses[0], np.ndarray) and isinstance(labels, list):
+        assert train_losses[0].shape[0] == len(labels)  # type: ignore
+        label_train = [f"Train {label}" for label in labels]
+        label_test = [f"Test {label}" for label in labels]
+
     num_epochs = len(test_losses) - 1
     num_batches_total = len(train_losses)
     assert num_batches_total % num_epochs == 0
@@ -98,8 +108,8 @@ def plot_losses(
     x_test = np.arange(num_epochs + 1)
 
     plt.figure(figsize=(10, 5))
-    plt.plot(x_train, train_losses, label="Train Loss")
-    plt.plot(x_test, test_losses, label="Test Loss")
+    plt.plot(x_train, train_losses, label=label_train)
+    plt.plot(x_test, test_losses, label=label_test)
 
     plt.xlabel("Epochs")
     plt.ylabel("Loss (value at the end of the epoch)")
