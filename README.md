@@ -137,6 +137,11 @@ encoder and decoder to learn rich latent representations on Colored MNIST and
   - Latent Diffusion (diffusion in latent space e.g. using VQ-VAE as encoder)
 
 
+- 🔁 **VAE For Images**
+  - Convolutional Variational Autoencoder to learn a meaningful and compact latent
+    space. The VAE can also be used to generate new samples.
+
+
 - 🤖 **Implementation Of Modern Generative Architectures From The Ground Up**
   - Modality agnostic GPT2
   - UNet for images
