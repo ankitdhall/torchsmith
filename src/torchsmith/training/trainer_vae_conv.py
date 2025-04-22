@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 from typing import Callable
 
@@ -7,7 +8,7 @@ from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from torchsmith.models.vae.vae_conv import VAEConv
+from torchsmith.models.vae.base import BaseVAE
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.utils.pytorch import get_device
@@ -18,17 +19,12 @@ device = get_device()
 def loop_VAE(
     dataloader: DataLoader,
     *,
-    model: torch.nn.Module,
+    model: BaseVAE,
     optimizer: Optimizer | None,
     scheduler: torch.optim.lr_scheduler.LRScheduler | None = None,
     show_progress: bool = False,
-) -> tuple[np.ndarray, np.ndarray]:
-    history: dict[str, list] = {
-        "loss": [],
-        "loss_reconstruction": [],
-        "loss_kl_div": [],
-        "num_items": [],
-    }
+) -> tuple[np.ndarray, np.ndarray, str]:
+    history: defaultdict[str, list] = defaultdict(list)
 
     if optimizer is not None:
         model.train()
@@ -45,17 +41,17 @@ def loop_VAE(
         if not optimizer:
             with torch.no_grad():
                 X = X.to(device)
-                loss, loss_reconstruction, loss_kl_div = model.loss(X)
+                loss = model.loss(X)
         else:
             X = X.to(device)
-            loss, loss_reconstruction, loss_kl_div = model.loss(X)
-        history["loss"].append(loss.item())
-        history["loss_reconstruction"].append(loss_reconstruction.item())
-        history["loss_kl_div"].append(loss_kl_div.item())
+            loss = model.loss(X)
+
+        for key in loss.KEYS:
+            history[key].append(getattr(loss, key).item())
         history["num_items"].append(batch_size)
 
         if optimizer:
-            loss.backward()
+            loss.get_total_loss().backward()
             optimizer.step()
             optimizer.zero_grad()
 
@@ -63,30 +59,20 @@ def loop_VAE(
                 scheduler.step()
 
     num_items_total = sum(history["num_items"])
-    loss_total = np.array(
-        [
-            sum(history["loss"]) / num_items_total,
-            sum(history["loss_reconstruction"]) / num_items_total,
-            sum(history["loss_kl_div"]) / num_items_total,
-        ]
-    )
+    loss_total = np.array([sum(history[key]) / num_items_total for key in loss.KEYS])
     losses_per_batch = np.stack(
-        [
-            np.array(history["loss"]) / np.array(history["num_items"]),
-            np.array(history["loss_reconstruction"]) / np.array(history["num_items"]),
-            np.array(history["loss_kl_div"]) / np.array(history["num_items"]),
-        ],
+        [np.array(history[key]) / np.array(history["num_items"]) for key in loss.KEYS],
         axis=-1,
     )
-
-    return loss_total, losses_per_batch
+    loss_description = loss.DESCRIPTION
+    return loss_total, losses_per_batch, loss_description
 
 
 class VAETrainer:
     def __init__(
         self,
         *,
-        model: VAEConv,
+        model: BaseVAE,
         data_handler: DataHandler,
         train_config: TrainConfig,
         generate_samples_fn: Callable,
@@ -128,7 +114,7 @@ class VAETrainer:
             f"Training starting from epoch: {self._epoch} to epoch: "
             f"{self.train_config.num_epochs}"
         )
-        loss_total_test, _ = loop_VAE(
+        loss_total_test, _, LOSS_DESCRIPTION = loop_VAE(
             test_dataloader,
             model=self.model,
             optimizer=None,
@@ -137,10 +123,10 @@ class VAETrainer:
         test_losses.append(loss_total_test)
         print(
             f"[At Epoch {self._epoch}] "
-            f"test: -ELBO, recon. loss, KL-div: {np.round(loss_total_test, 4)}"
+            f"test: {LOSS_DESCRIPTION}: {np.round(loss_total_test, 4)}"
         )
         for t in tqdm(range(self._epoch, self.train_config.num_epochs)):
-            loss_total_train, losses_per_batch_train = loop_VAE(
+            loss_total_train, losses_per_batch_train, LOSS_DESCRIPTION = loop_VAE(
                 train_dataloader,
                 model=self.model,
                 optimizer=self.optimizer,
@@ -148,7 +134,7 @@ class VAETrainer:
             )
             train_losses.extend(losses_per_batch_train)
 
-            loss_total_test, _ = loop_VAE(
+            loss_total_test, _, LOSS_DESCRIPTION = loop_VAE(
                 test_dataloader,
                 model=self.model,
                 optimizer=None,
@@ -158,8 +144,8 @@ class VAETrainer:
 
             print(
                 f"[At Epoch {t + 1}] "
-                f"train: -ELBO, recon. loss, KL-div: {np.round(loss_total_train, 4)} "
-                f"test: -ELBO, recon. loss, KL-div: {np.round(loss_total_test, 4)}"
+                f"train: {LOSS_DESCRIPTION}: {np.round(loss_total_train, 4)} "
+                f"test: {LOSS_DESCRIPTION}: {np.round(loss_total_test, 4)}"
             )
             self._epoch += 1
 

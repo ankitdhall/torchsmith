@@ -7,6 +7,7 @@ from torch.nn import functional as F
 
 from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.base import reparameterize
+from torchsmith.models.vae.dtypes import VAELoss
 from torchsmith.utils.pytorch import add_save_load
 from torchsmith.utils.pytorch import get_device
 
@@ -116,12 +117,16 @@ class VAEConv(BaseVAE):
         x = self.decoder(z)
         return x.cpu().numpy()
 
-    def loss(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def loss(self, x: torch.Tensor) -> VAELoss:
         mu_z, log_std_z, x, x_reconstructed = self(x)
         loss, loss_reconstruction, loss_kl_div = loss_function_conv(
             mu_z=mu_z, log_std_z=log_std_z, x=x, x_reconstructed=x_reconstructed
         )
-        return loss, loss_reconstruction, loss_kl_div
+        return VAELoss(
+            negative_ELBO=loss,
+            reconstruction_loss=loss_reconstruction,
+            KL_div_loss=loss_kl_div,
+        )
 
 
 def loss_function_conv(

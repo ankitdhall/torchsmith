@@ -6,6 +6,7 @@ from torch.distributions import kl_divergence
 
 from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.base import reparameterize
+from torchsmith.models.vae.dtypes import VAELoss
 from torchsmith.utils.pytorch import add_save_load
 from torchsmith.utils.pytorch import get_device
 
@@ -89,12 +90,16 @@ class VAE1D(BaseVAE):
         x = reparameterize(mu_x, log_std_x) if add_noise else mu_x
         return x.cpu().numpy()
 
-    def loss(self, x: torch.Tensor) -> tuple[torch.tensor, torch.tensor, torch.tensor]:
+    def loss(self, x: torch.Tensor) -> VAELoss:
         mu_z, log_std_z, mu_x, log_std_x = self(x)
         loss, loss_reconstruction, loss_kl_div = loss_function(
             x=x, mu_z=mu_z, log_std_z=log_std_z, mu_x=mu_x, log_std_x=log_std_x
         )
-        return loss, loss_reconstruction, loss_kl_div
+        return VAELoss(
+            negative_ELBO=loss,
+            reconstruction_loss=loss_reconstruction,
+            KL_div_loss=loss_kl_div,
+        )
 
 
 def negative_log_p_normal_distribution(
