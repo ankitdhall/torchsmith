@@ -38,8 +38,8 @@ def test_VAE1D() -> None:
     assert mu_x.shape == torch.Size([5, input_dim])
     assert log_var_x.shape == torch.Size([5, input_dim])
 
-    loss, loss_reconstruction, loss_kl_div = vae.loss(input)
-    assert loss == loss_reconstruction + loss_kl_div
+    loss = vae.loss(input)
+    assert loss.negative_ELBO == loss.reconstruction_loss + loss.KL_div_loss
 
 
 @pytest.mark.parametrize("add_noise", [True, False])
