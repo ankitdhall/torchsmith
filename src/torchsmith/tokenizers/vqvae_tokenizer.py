@@ -7,6 +7,7 @@ import torch
 from torchsmith.models.gpt2 import GPT2Decoder
 from torchsmith.models.vae.base import BaseVQVAE
 from torchsmith.tokenizers.base_tokenizer import BaseTokenizer
+from torchsmith.training.utils import plot_samples
 from torchsmith.utils.dtypes import TokenType
 from torchsmith.utils.plotting import plot_images
 from torchsmith.utils.pytorch import get_device
@@ -159,4 +160,35 @@ def generate_samples_image(
             titles=[f"Sample {index}" for index in range(num_samples)],
             max_cols=int(num_samples**0.5),
         )
+    return samples
+
+
+def generate_samples_image_v2(
+    *,
+    seq_len: int,
+    tokenizer: VQVAEImageTokenizer,
+    transformer: GPT2Decoder,
+    decode: bool,
+    num_samples: int = 9,
+    postprocess_fn: Callable | None = None,  # TODO: improve typing
+) -> torch.Tensor:
+    transformer.eval()
+    prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
+    exclude_indices = {tokenizer.bos_id, tokenizer.eos_id}
+    samples, _ = transformer.sample(
+        num_samples, seq_len=seq_len, prefix=prefix, exclude_indices=exclude_indices
+    )
+    # Skip the last token as it corresponds to what the model predicts after
+    # the last pixel in the image. This is not required during decoding.
+    # Skip the first token as it corresponds to the BOS token.
+    # This is not required during decoding.
+    decoded_images = np.array(
+        list(tokenizer.decode_batch(iter(sample[1:] for sample in samples.tolist())))
+    )
+    decoded_images = (
+        postprocess_fn(np.concatenate(decoded_images))
+        if postprocess_fn is not None
+        else decoded_images
+    )
+    plot_samples(decoded_images, num_rows=int(num_samples**0.5), show=True)
     return samples
