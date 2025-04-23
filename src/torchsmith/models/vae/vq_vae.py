@@ -200,9 +200,15 @@ class VQVAE(torch.nn.Module):
         z_q = self.codebook(z_e)
         x_reconstructed = self.decoder(z_q)
 
-        reconstruction_loss = F.mse_loss(x_reconstructed, x, reduction="sum")
-        loss_commitment = F.mse_loss(z_e, z_q.detach(), reduction="sum")
-        loss_codebook = F.mse_loss(z_e.detach(), z_q, reduction="sum")
+        reconstruction_loss = (
+            F.mse_loss(x_reconstructed, x, reduction="none").mean(dim=[1, 2, 3]).sum()
+        )
+        loss_commitment = (
+            F.mse_loss(z_e, z_q.detach(), reduction="none").mean(dim=[1, 2, 3]).sum()
+        )
+        loss_codebook = (
+            F.mse_loss(z_e.detach(), z_q, reduction="none").mean(dim=[1, 2, 3]).sum()
+        )
 
         codebook_encoder_loss = loss_commitment + loss_codebook
 
