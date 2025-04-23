@@ -39,33 +39,6 @@ class VQVAEMNIST(BaseVQVAE):
         return self.vqvae.n_embeddings
 
 
-def generate_samples_colored_mnist_image(
-    *,
-    seq_len: int,
-    tokenizer: VQVAEImageTokenizer,
-    transformer: GPT2Decoder,
-    decode: bool,
-) -> torch.Tensor:
-    transformer.eval()
-    num_samples = 9  # TODO: expose this
-    prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
-    samples, _ = transformer.sample(
-        num_samples, seq_len=seq_len, prefix=prefix, exclude_indices={tokenizer.bos_id}
-    )
-    if decode:
-        # Skip the last token as it corresponds to what the model predicts after
-        # the last pixel in the image. This is not required during decoding.
-        # Skip the first token as it corresponds to the BOS token.
-        # This is not required during decoding.
-        decoded_images = list(
-            tokenizer.decode_batch(iter(sample[1:] for sample in samples.tolist()))
-        )
-        plot_images(
-            decoded_images, titles=[f"Sample {index}" for index in range(num_samples)]
-        )
-    return samples
-
-
 class ColoredMNISTImageAndTextTokenizer(BaseTokenizer):
     BOS = "<start>"
 

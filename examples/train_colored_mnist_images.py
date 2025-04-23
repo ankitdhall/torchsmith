@@ -3,8 +3,8 @@ from typing import cast
 from torchsmith.datahub.colored_mnist import ColoredMNISTDataset
 from torchsmith.models.gpt2 import GPT2Decoder
 from torchsmith.tokenizers.mnist_tokenizer import VQVAEMNIST
-from torchsmith.tokenizers.mnist_tokenizer import generate_samples_colored_mnist_image
 from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
+from torchsmith.tokenizers.vqvae_tokenizer import generate_samples_image
 from torchsmith.training.config import GPT2Config
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
@@ -51,9 +51,7 @@ trainer = TrainerAutoregression(
     transformer=transformer,
     loss_fn=cross_entropy,
     sequence_length=transformer_config.seq_len,
-    generate_samples_fn=cast(
-        GenerateSamplesProtocol, generate_samples_colored_mnist_image
-    ),
+    generate_samples_fn=cast(GenerateSamplesProtocol, generate_samples_image),
     show_plots=False,
     sample_every_n_epochs=1,
     save_dir=experiment_dir,

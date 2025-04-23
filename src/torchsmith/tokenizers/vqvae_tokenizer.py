@@ -121,7 +121,7 @@ class VQVAEImageTokenizer(BaseTokenizer[TokenType]):
             yield self.decode(t)
 
 
-def generate_samples_colored_mnist_image(
+def generate_samples_image(
     *,
     seq_len: int,
     tokenizer: VQVAEImageTokenizer,

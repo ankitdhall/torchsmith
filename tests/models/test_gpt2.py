@@ -15,13 +15,13 @@ from torchsmith.tokenizers.mnist_tokenizer import (
 from torchsmith.tokenizers.mnist_tokenizer import (
     colored_mnist_with_text_conditioned_on_text,
 )
-from torchsmith.tokenizers.mnist_tokenizer import generate_samples_colored_mnist_image
 from torchsmith.tokenizers.mnist_tokenizer import (
     generate_samples_colored_mnist_with_text,
 )
 from torchsmith.tokenizers.mnist_tokenizer import sample_completion_image
 from torchsmith.tokenizers.text_tokenizer import sample_completion_text
 from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
+from torchsmith.tokenizers.vqvae_tokenizer import generate_samples_image
 from torchsmith.training.config import GPT2Config
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.plotting import plot_images
@@ -124,7 +124,7 @@ def test_gpt2_colored_mnist_sample() -> None:
     transformer = GPT2Decoder.load_model(path_to_weights).to(device)
     sequence_length = transformer.seq_len
     with suppress_plot():
-        samples = generate_samples_colored_mnist_image(
+        samples = generate_samples_image(
             seq_len=sequence_length,
             tokenizer=tokenizer,
             transformer=transformer,
