@@ -104,7 +104,11 @@ class VQVAEImageTokenizer(BaseTokenizer[TokenType]):
             raise ValueError(
                 f"Found '{type(sequence)}' for `sequence` instead of list[int]."
             )
-        sequence_2d = np.array(sequence).reshape(1, 7, 7)
+
+        # TODO: make the spatial dimensions generic
+        spatial_dim = int(len(sequence) ** 0.5)
+        assert len(sequence) == spatial_dim * spatial_dim
+        sequence_2d = np.array(sequence).reshape(1, spatial_dim, spatial_dim)
         return (
             self.vqvae.decode_from_indices(torch.tensor(sequence_2d, device=device))
             .cpu()
