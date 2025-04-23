@@ -53,7 +53,7 @@ class VQVAEImageTokenizer(BaseTokenizer[TokenType]):
 
     def image_to_sequence(self, x: np.ndarray) -> np.ndarray:
         return (
-            self.vqvae.encode_to_indices(torch.Tensor(x, device=device))
+            self.vqvae.encode_to_indices(torch.tensor(x, device=device))
             .reshape(x.shape[0], -1)
             .cpu()
             .numpy()
