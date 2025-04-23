@@ -3,6 +3,7 @@ from typing import Callable
 import numpy as np
 import torch
 
+from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.training.utils import plot_samples
 from torchsmith.utils.pytorch import get_device
@@ -11,7 +12,7 @@ device = get_device()
 
 
 def generate_samples(
-    model: VAEConv, *, num_samples: int = 100, postprocess_fn: Callable | None
+    model: BaseVAE, *, num_samples: int = 100, postprocess_fn: Callable | None
 ) -> np.ndarray:
     samples = model.sample(num_samples)
     samples = postprocess_fn(samples) if postprocess_fn is not None else samples
@@ -22,14 +23,12 @@ def generate_samples(
 def generate_reconstructions(
     *,
     num_samples: int,
-    model: VAEConv,
+    model: BaseVAE,
     dataloader: torch.utils.data.DataLoader,
     postprocess_fn: Callable | None,
 ) -> np.ndarray:
     x = next(iter(dataloader))[:num_samples].to(device)
-    with torch.no_grad():
-        z, _ = model.encoder(x)
-        x_recon = model.decoder(z)
+    x_recon = model.reconstruct(x)
     reconstructions = np.stack((x.cpu(), x_recon.cpu()), axis=1).reshape(
         (-1, 3, 32, 32)
     )

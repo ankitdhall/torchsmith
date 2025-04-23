@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from einops import rearrange
 
+from torchsmith.models.vae.base import BaseVAE
 from torchsmith.models.vae.dtypes import VQVAELoss
 from torchsmith.utils.pytorch import add_save_load
 from torchsmith.utils.pytorch import get_device
@@ -145,7 +146,7 @@ class VectorQuantizer(torch.nn.Module):
 
 
 @add_save_load
-class VQVAE(torch.nn.Module):
+class VQVAE(BaseVAE):
     def __init__(
         self,
         input_shape: tuple[int, ...],
@@ -167,13 +168,13 @@ class VQVAE(torch.nn.Module):
         self.latent_dim = latent_dim
 
     @torch.no_grad()
-    def encode(self, x: torch.Tensor) -> torch.Tensor:
+    def encode_to_indices(self, x: torch.Tensor) -> torch.Tensor:
         z_e = self.encoder(x)
         indices = self.codebook.encode_to_indices(z_e)
         return indices
 
     @torch.no_grad()
-    def decode(self, x: torch.Tensor) -> torch.Tensor:
+    def decode_from_indices(self, x: torch.Tensor) -> torch.Tensor:
         z_q = self.codebook.decode_to_features(x)
         return z_q
 
@@ -191,7 +192,7 @@ class VQVAE(torch.nn.Module):
             size=(num_samples, *self.encoder.output_shape()),
             device=device,
         )
-        z_q = self.decode(latent_indices)
+        z_q = self.decode_from_indices(latent_indices)
         x_hat = self.decoder(z_q)
         return x_hat.cpu().numpy()
 
@@ -218,3 +219,7 @@ class VQVAE(torch.nn.Module):
             reconstruction_loss=reconstruction_loss,
             codebook_encoder_loss=codebook_encoder_loss,
         )
+
+    @torch.no_grad()
+    def reconstruct(self, x: torch.Tensor) -> torch.Tensor:
+        return self(x)

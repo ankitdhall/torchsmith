@@ -128,6 +128,12 @@ class VAEConv(BaseVAE):
             KL_div_loss=loss_kl_div,
         )
 
+    @torch.no_grad()
+    def reconstruct(self, x: torch.Tensor) -> torch.Tensor:
+        mu_z, _ = self.encoder(x)
+        x_hat = self.decoder(mu_z)
+        return x_hat
+
 
 def loss_function_conv(
     *,
