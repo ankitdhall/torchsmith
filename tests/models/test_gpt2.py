@@ -7,8 +7,8 @@ from torchsmith.datahub.colored_mnist import ColoredMNISTWithTextDataset
 from torchsmith.datahub.colored_mnist import load_colored_mnist_dataset
 from torchsmith.models.gpt2.decoder import GPT2Decoder
 from torchsmith.tokenizers import CharacterTokenizer
+from torchsmith.tokenizers.mnist_tokenizer import VQVAEMNIST
 from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
 from torchsmith.tokenizers.mnist_tokenizer import (
     colored_mnist_with_text_conditioned_on_image,
 )
@@ -21,6 +21,7 @@ from torchsmith.tokenizers.mnist_tokenizer import (
 )
 from torchsmith.tokenizers.mnist_tokenizer import sample_completion_image
 from torchsmith.tokenizers.text_tokenizer import sample_completion_text
+from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 from torchsmith.training.config import GPT2Config
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.plotting import plot_images
@@ -116,7 +117,7 @@ def test_sample_completion_text() -> None:
 
 def test_gpt2_colored_mnist_sample() -> None:
     num_samples = 9
-    tokenizer = VQVAEColoredMNISTImageTokenizer(batch_size=10000)
+    tokenizer = VQVAEImageTokenizer(vqvae=VQVAEMNIST(), batch_size=10000)
     path_to_weights = huggingface_hub.hf_hub_download(
         "ankitdhall/colored_mnist_gpt2", filename="model.pth"
     )
@@ -135,7 +136,7 @@ def test_gpt2_colored_mnist_sample() -> None:
 
 def test_sample_completion_colored_mnist() -> None:
     num_completions = 4
-    tokenizer = VQVAEColoredMNISTImageTokenizer(batch_size=10000)
+    tokenizer = VQVAEImageTokenizer(vqvae=VQVAEMNIST(), batch_size=10000)
     path_to_weights = huggingface_hub.hf_hub_download(
         "ankitdhall/colored_mnist_gpt2", filename="model.pth"
     )

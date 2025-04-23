@@ -11,7 +11,7 @@ from torchsmith.utils.pytorch import get_device
 
 if TYPE_CHECKING:
     from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-    from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+    from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 
 device = get_device()
 
@@ -55,7 +55,7 @@ class ColoredMNISTDataset(torch.utils.data.Dataset):
     def __init__(
         self,
         split: Literal["train", "test"],
-        tokenizer: "VQVAEColoredMNISTImageTokenizer",
+        tokenizer: "VQVAEImageTokenizer",
     ) -> None:
         images, _ = load_colored_mnist_dataset(split)  # (N, 28, 28, 3)
         self.tokenizer = tokenizer

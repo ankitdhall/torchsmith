@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from torchsmith.models.gpt2 import GPT2Decoder
     from torchsmith.tokenizers import TextTokenizer
     from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-    from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+    from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 
 T = TypeVar("T")
 X = TypeVar("X")
@@ -27,7 +27,7 @@ class GenerateSamplesProtocol(Protocol):
         seq_len: int,
         tokenizer: Union[
             "TextTokenizer",
-            "VQVAEColoredMNISTImageTokenizer",
+            "VQVAEImageTokenizer",
             "ColoredMNISTImageAndTextTokenizer",
         ],
         transformer: "GPT2Decoder",
