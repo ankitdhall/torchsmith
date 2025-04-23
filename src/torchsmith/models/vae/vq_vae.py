@@ -181,7 +181,8 @@ class VQVAE(BaseVAE, BaseVQVAE):
     @torch.no_grad()
     def decode_from_indices(self, x: torch.Tensor) -> torch.Tensor:
         z_q = self.codebook.decode_to_features(x)
-        return z_q
+        x_hat = self.decoder(z_q)
+        return x_hat
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         z_e = self.encoder(x)
@@ -197,8 +198,7 @@ class VQVAE(BaseVAE, BaseVQVAE):
             size=(num_samples, *self.encoder.output_shape()),
             device=device,
         )
-        z_q = self.decode_from_indices(latent_indices)
-        x_hat = self.decoder(z_q)
+        x_hat = self.decode_from_indices(latent_indices)
         return x_hat.cpu().numpy()
 
     def loss(self, x: torch.Tensor) -> VQVAELoss:

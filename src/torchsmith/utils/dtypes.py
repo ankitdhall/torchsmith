@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from typing import Callable
 from typing import Protocol
 from typing import TypeVar
 from typing import Union
@@ -32,4 +33,5 @@ class GenerateSamplesProtocol(Protocol):
         ],
         transformer: "GPT2Decoder",
         decode: bool,
+        postprocess_fn: Callable | None = None,
     ) -> torch.Tensor | tuple[list[np.ndarray], list[str]]: ...

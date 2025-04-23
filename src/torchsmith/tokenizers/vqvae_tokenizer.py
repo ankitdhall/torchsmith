@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Callable
 
 import numpy as np
 import torch
@@ -131,12 +132,14 @@ def generate_samples_image(
     tokenizer: VQVAEImageTokenizer,
     transformer: GPT2Decoder,
     decode: bool,
+    postprocess_fn: Callable | None = None,  # TODO: improve typing
 ) -> torch.Tensor:
     transformer.eval()
     num_samples = 9  # TODO: expose this
     prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
+    exclude_indices = {tokenizer.bos_id, tokenizer.eos_id}
     samples, _ = transformer.sample(
-        num_samples, seq_len=seq_len, prefix=prefix, exclude_indices={tokenizer.bos_id}
+        num_samples, seq_len=seq_len, prefix=prefix, exclude_indices=exclude_indices
     )
     if decode:
         # Skip the last token as it corresponds to what the model predicts after
@@ -145,6 +148,11 @@ def generate_samples_image(
         # This is not required during decoding.
         decoded_images = list(
             tokenizer.decode_batch(iter(sample[1:] for sample in samples.tolist()))
+        )
+        decoded_images = (
+            list(postprocess_fn(np.concatenate(decoded_images)))
+            if postprocess_fn is not None
+            else decoded_images
         )
         plot_images(
             decoded_images, titles=[f"Sample {index}" for index in range(num_samples)]

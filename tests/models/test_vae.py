@@ -146,7 +146,7 @@ def test_vqvae() -> None:
     input_decoded = vqvae.decode_from_indices(input_encoded)
     assert torch.isin(input_encoded, torch.arange(0, codebook_size, 1)).all()
     assert input_encoded.shape == torch.Size([num_samples, *latent_shape])
-    assert input_decoded.shape == torch.Size([num_samples, latent_dim, *latent_shape])
+    assert input_decoded.shape == torch.Size([num_samples, *input_shape])
 
     loss = vqvae.loss(input)
     assert (
