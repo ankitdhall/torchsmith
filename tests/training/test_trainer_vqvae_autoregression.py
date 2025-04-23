@@ -25,7 +25,6 @@ def postprocess_data_transformer(x: np.ndarray) -> np.ndarray:
     # Assume x in [-1, 1]
     x = np.clip(x, a_min=-1, a_max=1)
     x = (x / 2) + 0.5  # -> [0, 1]
-    # x = (x * 255).astype(int)
     x = np.transpose(x, (0, 2, 3, 1))
     return x  # in [0, 1]
 
@@ -69,7 +68,9 @@ def test_vqvae_with_autoregression(tmp_path: Path) -> None:
         loss_fn=cross_entropy,
         sequence_length=transformer_config.seq_len,
         generate_samples_fn=partial(
-            generate_samples_image, postprocess_fn=postprocess_data_transformer
+            generate_samples_image,
+            postprocess_fn=postprocess_data_transformer,
+            num_samples=25,
         ),
         show_plots=False,
         sample_every_n_epochs=1,

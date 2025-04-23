@@ -132,10 +132,10 @@ def generate_samples_image(
     tokenizer: VQVAEImageTokenizer,
     transformer: GPT2Decoder,
     decode: bool,
+    num_samples: int = 9,
     postprocess_fn: Callable | None = None,  # TODO: improve typing
 ) -> torch.Tensor:
     transformer.eval()
-    num_samples = 9  # TODO: expose this
     prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
     exclude_indices = {tokenizer.bos_id, tokenizer.eos_id}
     samples, _ = transformer.sample(
@@ -155,6 +155,8 @@ def generate_samples_image(
             else decoded_images
         )
         plot_images(
-            decoded_images, titles=[f"Sample {index}" for index in range(num_samples)]
+            decoded_images,
+            titles=[f"Sample {index}" for index in range(num_samples)],
+            max_cols=int(num_samples**0.5),
         )
     return samples
