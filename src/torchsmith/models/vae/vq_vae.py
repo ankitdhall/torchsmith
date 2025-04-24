@@ -143,8 +143,7 @@ class VectorQuantizer(torch.nn.Module):
         )  # (B, C, H, W) -> (B, H, W)
 
         x_quantized = self.decode_to_features(indices_to_closest_embedding)
-        x_q_with_ste = (x_quantized - x).detach() + x
-        return x_q_with_ste
+        return x_quantized
 
 
 @add_save_load
@@ -205,7 +204,8 @@ class VQVAE(BaseVAE, BaseVQVAE):
     def loss(self, x: torch.Tensor) -> VQVAELoss:
         z_e = self.encoder(x)
         z_q = self.codebook(z_e)
-        x_reconstructed = self.decoder(z_q)
+        z_q_ste = (z_q - z_e).detach() + z_e
+        x_reconstructed = self.decoder(z_q_ste)
 
         reconstruction_loss = (
             F.mse_loss(x_reconstructed, x, reduction="none").mean(dim=[1, 2, 3]).sum()
