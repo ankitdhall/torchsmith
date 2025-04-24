@@ -98,6 +98,7 @@ class Decoder(torch.nn.Module):
                 stride=2,
                 padding=1,
             ),  # 1/2 x 1/2 -> 1x1
+            torch.nn.Tanh(),
         ]
         self.model = torch.nn.Sequential(*layers)
 
