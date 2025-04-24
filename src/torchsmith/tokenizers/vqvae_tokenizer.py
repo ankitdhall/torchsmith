@@ -191,4 +191,4 @@ def generate_samples_image_v2(
         else decoded_images
     )
     plot_samples(decoded_images, num_rows=int(num_samples**0.5), show=True)
-    return samples
+    return decoded_images

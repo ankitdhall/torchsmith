@@ -152,3 +152,36 @@ def test_vqvae() -> None:
     assert (
         loss.get_total_loss() == loss.reconstruction_loss + loss.codebook_encoder_loss
     )
+
+
+@pytest.mark.parametrize(
+    "model_path",
+    [
+        "ankitdhall/svhn_vqvae",
+        "ankitdhall/cifar10_vqvae",
+    ],
+)
+def test_vqvae_from_loaded_model(model_path: str) -> None:
+    input_shape = (3, 32, 32)
+    latent_shape = (32 // 4, 32 // 4)
+    num_samples = 5
+    path_to_weights = huggingface_hub.hf_hub_download(model_path, filename="model.pth")
+    vqvae = VQVAE.load_model(path_to_weights).to(device)
+
+    input = (
+        torch.rand((num_samples, *input_shape), device=device) - 0.5
+    ) * 2  # [0, 1] -> [-1, 1]
+
+    x_reconstructed = vqvae(input)
+    assert x_reconstructed.shape == torch.Size([num_samples, *input_shape])
+
+    input_encoded = vqvae.encode_to_indices(input)
+    input_decoded = vqvae.decode_from_indices(input_encoded)
+    assert torch.isin(input_encoded, torch.arange(0, vqvae.codebook_size, 1)).all()
+    assert input_encoded.shape == torch.Size([num_samples, *latent_shape])
+    assert input_decoded.shape == torch.Size([num_samples, *input_shape])
+
+    loss = vqvae.loss(input)
+    assert (
+        loss.get_total_loss() == loss.reconstruction_loss + loss.codebook_encoder_loss
+    )

@@ -17,17 +17,10 @@ from torchsmith.training.losses import cross_entropy
 from torchsmith.training.trainer_autoregression import TrainerAutoregression
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.plotting import plot_losses
+from torchsmith.utils.plotting import suppress_plot
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()
-
-
-def postprocess_data_transformer(x: np.ndarray) -> np.ndarray:
-    # Assume x in [-1, 1]
-    x = np.clip(x, a_min=-1, a_max=1)
-    x = (x / 2) + 0.5  # -> [0, 1]
-    x = np.transpose(x, (0, 2, 3, 1))
-    return x  # in [0, 1]
 
 
 def test_vqvae_with_autoregression(tmp_path: Path) -> None:
@@ -61,32 +54,33 @@ def test_vqvae_with_autoregression(tmp_path: Path) -> None:
         test_dataset=test_data_tokens,
         train_config=train_config_transformer,
     )
-    trainer_transformer = TrainerAutoregression(
-        data_handler=data_handler_transformer,
-        tokenizer=vqvae_tokenizer,
-        train_config=train_config_transformer,
-        transformer=transformer,
-        loss_fn=cross_entropy,
-        sequence_length=transformer_config.seq_len,
-        generate_samples_fn=partial(
-            generate_samples_image_v2,
-            postprocess_fn=postprocess_data,
-            num_samples=25,
-        ),
-        show_plots=False,
-        sample_every_n_epochs=1,
-        save_dir=experiment_dir,
-        save_every_n_epochs=1,
-    )
-    (
-        transformer,
-        train_losses_transformer,
-        test_losses_transformer,
-        samples_transformer,
-    ) = trainer_transformer.train()
-    plot_losses(
-        train_losses_transformer,
-        test_losses=test_losses_transformer,
-        save_dir=experiment_dir,
-        show=True,
-    )
+    with suppress_plot():
+        trainer_transformer = TrainerAutoregression(
+            data_handler=data_handler_transformer,
+            tokenizer=vqvae_tokenizer,
+            train_config=train_config_transformer,
+            transformer=transformer,
+            loss_fn=cross_entropy,
+            sequence_length=transformer_config.seq_len,
+            generate_samples_fn=partial(
+                generate_samples_image_v2,
+                postprocess_fn=postprocess_data,
+                num_samples=25,
+            ),
+            show_plots=False,
+            sample_every_n_epochs=1,
+            save_dir=experiment_dir,
+            save_every_n_epochs=1,
+        )
+        (
+            transformer,
+            train_losses_transformer,
+            test_losses_transformer,
+            samples_transformer,
+        ) = trainer_transformer.train()
+        plot_losses(
+            train_losses_transformer,
+            test_losses=test_losses_transformer,
+            save_dir=experiment_dir,
+            show=True,
+        )
