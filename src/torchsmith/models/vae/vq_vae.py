@@ -31,7 +31,7 @@ class ResidualBlock(torch.nn.Module):
         self.model = torch.nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.model(x)  # (B, C, H, W) -> (B, C, H, W)
+        return x + self.model(x)  # (B, C, H, W) -> (B, C, H, W)
 
 
 class Encoder(torch.nn.Module):
@@ -98,7 +98,6 @@ class Decoder(torch.nn.Module):
                 stride=2,
                 padding=1,
             ),  # 1/2 x 1/2 -> 1x1
-            torch.nn.Tanh(),
         ]
         self.model = torch.nn.Sequential(*layers)
 
