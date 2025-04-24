@@ -6,7 +6,7 @@ import torch
 from torchsmith.datahub.images_with_vqvae import ImagesWithVQVAEDataset
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.models.gpt2 import GPT2Decoder
-from torchsmith.models.vae.vq_vae import VQVAE
+from torchsmith.models.vae.vqvae import VQVAE
 from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 from torchsmith.tokenizers.vqvae_tokenizer import generate_samples_image_v2
 from torchsmith.utils.constants import RANDOM_STATE
