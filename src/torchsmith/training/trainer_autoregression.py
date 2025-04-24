@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from torchsmith.tokenizers import TextTokenizer
 from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.scheduler import get_scheduler
@@ -68,7 +68,7 @@ class TrainerAutoregression:
         self,
         *,
         tokenizer: TextTokenizer
-        | VQVAEColoredMNISTImageTokenizer
+        | VQVAEImageTokenizer
         | ColoredMNISTImageAndTextTokenizer,
         data_handler: DataHandler,
         train_config: TrainConfig,

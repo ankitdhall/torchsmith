@@ -3,12 +3,15 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+import pytest
 from torch.utils.data import DataLoader
 
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.datahub.svhn import preprocess_data
+from torchsmith.models.vae import VQVAE
+from torchsmith.models.vae import BaseVAE
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.trainer_vae_conv import VAETrainer
@@ -20,7 +23,14 @@ from torchsmith.utils.pytorch import get_device
 device = get_device()
 
 
-def test_train_vae(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "model",
+    [
+        VAEConv((3, 32, 32), latent_dim=16).to(device),
+        VQVAE((3, 32, 32), latent_dim=16, codebook_size=10).to(device),
+    ],
+)
+def test_train_vae(model: BaseVAE, tmp_path: Path) -> None:
     train_config = TrainConfig(
         num_epochs=3,
         batch_size=128,
@@ -37,8 +47,6 @@ def test_train_vae(tmp_path: Path) -> None:
     test_dataloader = DataLoader(
         test_data, batch_size=train_config.batch_size, shuffle=False
     )
-
-    model = VAEConv((3, 32, 32), latent_dim=16).to(device)
 
     experiment_dir = tmp_path
     data_handler = DataHandler(

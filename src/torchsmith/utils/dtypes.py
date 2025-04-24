@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from typing import Callable
 from typing import Protocol
 from typing import TypeVar
 from typing import Union
@@ -10,7 +11,7 @@ if TYPE_CHECKING:
     from torchsmith.models.gpt2 import GPT2Decoder
     from torchsmith.tokenizers import TextTokenizer
     from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-    from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+    from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 
 T = TypeVar("T")
 X = TypeVar("X")
@@ -27,9 +28,10 @@ class GenerateSamplesProtocol(Protocol):
         seq_len: int,
         tokenizer: Union[
             "TextTokenizer",
-            "VQVAEColoredMNISTImageTokenizer",
+            "VQVAEImageTokenizer",
             "ColoredMNISTImageAndTextTokenizer",
         ],
         transformer: "GPT2Decoder",
         decode: bool,
+        postprocess_fn: Callable | None = None,
     ) -> torch.Tensor | tuple[list[np.ndarray], list[str]]: ...

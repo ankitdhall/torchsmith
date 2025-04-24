@@ -27,3 +27,24 @@ class BaseVAE(ABC, torch.nn.Module):
     def loss(self, x: torch.Tensor) -> Loss:
         # Returns: negative ELBO, reconstruction loss, KL-div loss
         raise NotImplementedError()
+
+    @abstractmethod
+    def reconstruct(self, x: torch.Tensor) -> torch.Tensor:
+        raise NotImplementedError()
+
+
+class BaseVQVAE(ABC, torch.nn.Module):
+    @abstractmethod
+    @torch.no_grad()
+    def encode_to_indices(self, x: torch.Tensor) -> torch.Tensor:
+        raise NotImplementedError()
+
+    @abstractmethod
+    @torch.no_grad()
+    def decode_from_indices(self, x: torch.Tensor) -> torch.Tensor:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def codebook_size(self) -> int:
+        raise NotImplementedError()

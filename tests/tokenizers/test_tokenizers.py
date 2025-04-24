@@ -9,8 +9,9 @@ import pytest
 from torchsmith.tokenizers.byte_pair_encoding_tokenizer import BytePairEncodingBuilder
 from torchsmith.tokenizers.byte_pair_encoding_tokenizer import replace_pair
 from torchsmith.tokenizers.character_tokenizer import CharacterTokenizer
-from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+from torchsmith.tokenizers.mnist_tokenizer import VQVAEMNIST
 from torchsmith.tokenizers.string_tokenizer import StringTokenizer
+from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 from torchsmith.utils.constants import RANDOM_STATE
 
 
@@ -322,7 +323,7 @@ def test_replace_pair() -> None:
     "size", [(28, 28, 3), (1, 28, 28, 3), (2, 28, 28, 3), (5, 28, 28, 3)]
 )
 def test_colored_mnist_image_tokenizer(size: tuple[int]) -> None:
-    tokenizer = VQVAEColoredMNISTImageTokenizer(verbose=True, batch_size=2)
+    tokenizer = VQVAEImageTokenizer(vqvae=VQVAEMNIST(), verbose=True, batch_size=2)
     rng = np.random.default_rng(RANDOM_STATE)
     image = rng.choice(4, size=size, replace=True)
     image_encoded = tokenizer.encode(image, drop_bos=False, drop_eos=True)

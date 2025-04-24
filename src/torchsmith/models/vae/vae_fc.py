@@ -101,6 +101,12 @@ class VAE1D(BaseVAE):
             KL_div_loss=loss_kl_div,
         )
 
+    @torch.no_grad()
+    def reconstruct(self, x: torch.Tensor) -> torch.Tensor:
+        mu_z, _ = self.encode(x)
+        mu_x_hat, _ = self.decode(mu_z)
+        return mu_x_hat
+
 
 def negative_log_p_normal_distribution(
     x: torch.tensor, *, mu_x: torch.tensor, log_std_x: torch.tensor

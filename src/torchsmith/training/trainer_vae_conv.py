@@ -8,7 +8,7 @@ from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from torchsmith.models.vae.base import BaseVAE
+from torchsmith.models.vae import BaseVAE
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.utils.pytorch import get_device

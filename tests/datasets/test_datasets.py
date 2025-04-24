@@ -5,8 +5,9 @@ from torchsmith.datahub.colored_mnist import ColoredMNISTWithTextDataset
 from torchsmith.datahub.poetry import PoetryDataset
 from torchsmith.datahub.poetry import get_huggingface_dataset
 from torchsmith.tokenizers import CharacterTokenizer
+from torchsmith.tokenizers.mnist_tokenizer import VQVAEMNIST
 from torchsmith.tokenizers.mnist_tokenizer import ColoredMNISTImageAndTextTokenizer
-from torchsmith.tokenizers.mnist_tokenizer import VQVAEColoredMNISTImageTokenizer
+from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer
 
 
 def test_poetry_dataset() -> None:
@@ -20,7 +21,7 @@ def test_poetry_dataset() -> None:
 
 
 def test_colored_mnist() -> None:
-    tokenizer = VQVAEColoredMNISTImageTokenizer()
+    tokenizer = VQVAEImageTokenizer(vqvae=VQVAEMNIST())
     dataset = ColoredMNISTDataset(split="test", tokenizer=tokenizer)
     assert dataset[0].shape == torch.Size([7 * 7 + 1])
     assert ColoredMNISTDataset.SEQUENCE_LENGTH == 49 + 1

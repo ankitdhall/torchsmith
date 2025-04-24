@@ -7,12 +7,12 @@ from torch.utils.data import DataLoader
 
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.datahub.svhn import preprocess_data
+from torchsmith.models.vae import VAE1D
+from torchsmith.models.vae import VQVAE
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_interpolations
-from torchsmith.models.vae.utils import generate_reconstructions
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.models.vae.vae_fc import MLP
-from torchsmith.models.vae.vae_fc import VAE1D
 from torchsmith.models.vae.vae_fc import negative_log_p_normal_distribution
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.plotting import suppress_plot
@@ -90,37 +90,6 @@ def test_VAEConv() -> None:
     assert log_std_z.shape == torch.Size([num_samples, latent_dim])
 
 
-def test_generate_samples() -> None:
-    num_samples = 16
-    input_shape = (3, 32, 32)
-    latent_dim = 16
-    vae = VAEConv(input_shape, latent_dim=latent_dim).to(device)
-    with suppress_plot():
-        samples = generate_samples(
-            vae, num_samples=num_samples, postprocess_fn=postprocess_data
-        )
-    assert samples.shape == torch.Size([num_samples, *input_shape])
-
-
-def test_generate_reconstructions() -> None:
-    num_samples = 5
-    input_shape = (3, 32, 32)
-    latent_dim = 16
-    vae = VAEConv(input_shape, latent_dim=latent_dim).to(device)
-
-    rng = np.random.default_rng(seed=RANDOM_STATE)
-    data = preprocess_data(rng.random((20, 3, 32, 32)).astype("float32"))
-    dataloader = DataLoader(data, batch_size=10, shuffle=True)
-    with suppress_plot():
-        samples = generate_reconstructions(
-            num_samples=num_samples,
-            model=vae,
-            dataloader=dataloader,
-            postprocess_fn=postprocess_data,
-        )
-    assert samples.shape == torch.Size([2 * num_samples, *input_shape])
-
-
 def test_generate_interpolations() -> None:
     num_samples = 5
     num_steps = 5
@@ -160,3 +129,59 @@ def test_VAEConv_sample_from_loaded_model(model_path: str) -> None:
             vae, num_samples=num_samples, postprocess_fn=postprocess_data
         )
     assert samples.shape == torch.Size([num_samples, *input_shape])
+
+
+def test_vqvae() -> None:
+    input_shape = (3, 32, 32)
+    latent_shape = (32 // 4, 32 // 4)
+    latent_dim = 16
+    num_samples = 5
+    codebook_size = 10
+    vqvae = VQVAE(input_shape, latent_dim=latent_dim, codebook_size=codebook_size)
+    input = (torch.rand((num_samples, *input_shape)) - 0.5) * 2  # [0, 1] -> [-1, 1]
+    x_reconstructed = vqvae(input)
+    assert x_reconstructed.shape == torch.Size([num_samples, *input_shape])
+
+    input_encoded = vqvae.encode_to_indices(input)
+    input_decoded = vqvae.decode_from_indices(input_encoded)
+    assert torch.isin(input_encoded, torch.arange(0, codebook_size, 1)).all()
+    assert input_encoded.shape == torch.Size([num_samples, *latent_shape])
+    assert input_decoded.shape == torch.Size([num_samples, *input_shape])
+
+    loss = vqvae.loss(input)
+    assert (
+        loss.get_total_loss() == loss.reconstruction_loss + loss.codebook_encoder_loss
+    )
+
+
+@pytest.mark.parametrize(
+    "model_path",
+    [
+        "ankitdhall/svhn_vqvae",
+        "ankitdhall/cifar10_vqvae",
+    ],
+)
+def test_vqvae_from_loaded_model(model_path: str) -> None:
+    input_shape = (3, 32, 32)
+    latent_shape = (32 // 4, 32 // 4)
+    num_samples = 5
+    path_to_weights = huggingface_hub.hf_hub_download(model_path, filename="model.pth")
+    vqvae = VQVAE.load_model(path_to_weights).to(device)
+
+    input = (
+        torch.rand((num_samples, *input_shape), device=device) - 0.5
+    ) * 2  # [0, 1] -> [-1, 1]
+
+    x_reconstructed = vqvae(input)
+    assert x_reconstructed.shape == torch.Size([num_samples, *input_shape])
+
+    input_encoded = vqvae.encode_to_indices(input)
+    input_decoded = vqvae.decode_from_indices(input_encoded)
+    assert torch.isin(input_encoded, torch.arange(0, vqvae.codebook_size, 1)).all()
+    assert input_encoded.shape == torch.Size([num_samples, *latent_shape])
+    assert input_decoded.shape == torch.Size([num_samples, *input_shape])
+
+    loss = vqvae.loss(input)
+    assert (
+        loss.get_total_loss() == loss.reconstruction_loss + loss.codebook_encoder_loss
+    )

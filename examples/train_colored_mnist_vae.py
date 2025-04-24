@@ -10,10 +10,10 @@ from torchvision.transforms import Resize
 from torchsmith.datahub.colored_mnist import load_colored_mnist_dataset
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.datahub.svhn import preprocess_data
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_interpolations
 from torchsmith.models.vae.utils import generate_reconstructions
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.trainer_vae_conv import VAETrainer
