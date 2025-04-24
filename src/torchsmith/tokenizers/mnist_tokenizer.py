@@ -8,7 +8,7 @@ from torchsmith.datahub.colored_mnist import ColoredMNISTWithTextDataset
 from torchsmith.datahub.colored_mnist import get_unique_tokens
 from torchsmith.models.external.colored_mnist import load_pretrain_vqvae
 from torchsmith.models.gpt2 import GPT2Decoder
-from torchsmith.models.vae.base import BaseVQVAE
+from torchsmith.models.vae import BaseVQVAE
 from torchsmith.tokenizers.base_tokenizer import BaseTokenizer
 from torchsmith.tokenizers.string_tokenizer import WordTokenizer
 from torchsmith.tokenizers.vqvae_tokenizer import VQVAEImageTokenizer

@@ -3,8 +3,8 @@ from typing import Callable
 import numpy as np
 import torch
 
-from torchsmith.models.vae.base import BaseVAE
-from torchsmith.models.vae.vae_conv import VAEConv
+from torchsmith.models.vae import BaseVAE
+from torchsmith.models.vae import VAEConv
 from torchsmith.training.utils import plot_samples
 from torchsmith.utils.pytorch import get_device
 

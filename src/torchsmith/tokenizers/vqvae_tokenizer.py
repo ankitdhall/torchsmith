@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from torchsmith.models.gpt2 import GPT2Decoder
-from torchsmith.models.vae.base import BaseVQVAE
+from torchsmith.models.vae import BaseVQVAE
 from torchsmith.tokenizers.base_tokenizer import BaseTokenizer
 from torchsmith.training.utils import plot_samples
 from torchsmith.utils.dtypes import TokenType

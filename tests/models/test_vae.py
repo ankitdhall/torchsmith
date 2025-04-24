@@ -7,13 +7,13 @@ from torch.utils.data import DataLoader
 
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.datahub.svhn import preprocess_data
+from torchsmith.models.vae import VAE1D
+from torchsmith.models.vae import VQVAE
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_interpolations
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.models.vae.vae_fc import MLP
-from torchsmith.models.vae.vae_fc import VAE1D
 from torchsmith.models.vae.vae_fc import negative_log_p_normal_distribution
-from torchsmith.models.vae.vqvae import VQVAE
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.plotting import suppress_plot
 from torchsmith.utils.pytorch import get_device

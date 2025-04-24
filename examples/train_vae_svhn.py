@@ -5,10 +5,10 @@ from torch.utils.data import DataLoader
 
 from torchsmith.datahub.svhn import get_svhn
 from torchsmith.datahub.svhn import postprocess_data
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_interpolations
 from torchsmith.models.vae.utils import generate_reconstructions
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.trainer_vae_conv import VAETrainer

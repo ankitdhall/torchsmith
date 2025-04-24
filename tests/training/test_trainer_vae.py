@@ -8,10 +8,10 @@ from torch.utils.data import DataLoader
 
 from torchsmith.datahub.svhn import postprocess_data
 from torchsmith.datahub.svhn import preprocess_data
-from torchsmith.models.vae.base import BaseVAE
+from torchsmith.models.vae import VQVAE
+from torchsmith.models.vae import BaseVAE
+from torchsmith.models.vae import VAEConv
 from torchsmith.models.vae.utils import generate_samples
-from torchsmith.models.vae.vae_conv import VAEConv
-from torchsmith.models.vae.vqvae import VQVAE
 from torchsmith.training.config import TrainConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.trainer_vae_conv import VAETrainer
