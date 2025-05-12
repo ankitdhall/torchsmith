@@ -13,8 +13,8 @@
 
 ## 🔥 Why Torchsmith?
 Torchsmith is a minimalist library that focuses on understanding by building.
-Torchsmith builds multimodal modern generative AI, such as autoregressive and
-diffusion models trained on image, text, and image-text pairs.
+Torchsmith builds multimodal modern generative AI, such as **VAEs**, **VQVAEs**,
+**autoregressive** and **diffusion models** trained on image, text, and image-text pairs.
 
 Torchsmith is built using basic [PyTorch](https://pytorch.org/) operations,
 without relying on high-level abstractions.
@@ -27,6 +27,8 @@ learning rate schedulers, various text and image tokenizers, to name a few.
 Torchsmith was inspired by [Berkeley's CS294-158](https://sites.google.com/view/berkeley-cs294-158-sp24/home).
 
 ## 🎬 Torchsmith In Action
+
+Here is a quick highlight reel, for more experiments see the [experiments](#experiments).
 
 ### Image Generation
 
@@ -120,6 +122,64 @@ encoder and decoder to learn rich latent representations on Colored MNIST and
     (left) Colored MNIST dataset (right) SVHN dataset.
 </p>
 
+### Discrete Representation Learning with VQVAEs With Autoregressive Prior
+
+Vector Quantized-Variational Autoencoders ([VQVAEs](https://arxiv.org/abs/1711.00937))
+are trained from scratch to learn
+discrete latent representations of images. An autoregressive transformer is
+then trained on the learned discrete latent representations as a prior on top of the
+VQVAE. This is then used to sample from the latent space and decode to image space
+(using the VQVAE's decoder).
+
+This can be done end-to-end as a 2-step process:
+- **Step 1**: learning of the discrete latent representation via the VQVAE.
+- **Step 2**: This is then followed by autoregressive modeling of the prior using a GPT2 on
+top of the VQVAE's learned latent representation.
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step1_vqvae/epoch_1.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 1"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step1_vqvae/epoch_10.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 10"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step1_vqvae/epoch_20.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 20"
+    width="32%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. SVHN Dataset. Step 1: VQVAE.
+    50 (original image, reconstructed) pairs at the end of epoch 1 (left), epoch 10
+    (center) and epoch 20 (right) (out of total 20 epochs).
+    The reconstructed image is obtained by passing the original image through the
+    VQVAE (encoder followed by decoder).
+    One can notice how the reconstructed image gets closer to the original image as
+    the training progresses.
+</p>
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step2_gpt2/epoch_1.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 1"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step2_gpt2/epoch_10.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 10"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step2_gpt2/epoch_20.png"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 20"
+    width="32%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. SVHN Dataset. Step 2: Autoregressive modeling of the prior using GPT2.
+    100 unconditional samples generated at the end of epoch 1 (left), epoch 10
+    (center) and epoch 20 (right) (out of total 20 epochs).
+    Sampling is performed by the autoregressive model in latent space. The VQVAE
+    from step 1 is then used to decode the latent space and decode to image space.
+    One can notice the improvement in the quality of the generated image as the
+    training progresses.
+</p>
+
+
+
 ---
 
 ## ✨ Features
@@ -137,9 +197,13 @@ encoder and decoder to learn rich latent representations on Colored MNIST and
   - Latent Diffusion (diffusion in latent space e.g. using VQ-VAE as encoder)
 
 
-- 🔁 **VAE For Images**
+- 🔁 **VAE and VQVAEs For Images**
   - Convolutional Variational Autoencoder to learn a meaningful and compact latent
     space. The VAE can also be used to generate new samples.
+  - VQVAEs learn discrete latent representations allowing modeling of the prior
+    using an autoregressive model which is well-suited (for generating in) the discrete
+    representation space.
+  - End-to-end VQVAE with autoregressive prior trained on the learned discrete latent representations.
 
 
 - 🤖 **Implementation Of Modern Generative Architectures From The Ground Up**
@@ -174,7 +238,7 @@ encoder and decoder to learn rich latent representations on Colored MNIST and
 
 ---
 
-## 🔬 Experiments
+## Experiments
 
 ### [Autoregression] Colored MNIST With Text Labels
 This experiment involves using GPT2-style decoder trained with autoregression.
@@ -401,14 +465,14 @@ The Street View House Numbers dataset is modeled using a convolutional VAE with 
 <p align="center">
     <img src="assets/svhn_vae/reconstructions.png" alt="Pairs of original
     image (from the dataset) and reconstructed image"
-    width="33%">
+    width="32%">
     <img src="assets/svhn_vae/interpolations.png" alt="SVHN
     samples generated after linearly interpolating between a starting and
     endpoint"
-    width="33%">
+    width="32%">
     <img src="assets/svhn_vae/samples.png" alt="SVHN
     samples after 10 epochs"
-    width="33%">
+    width="32%">
 </p>
 <p align="center" style="font-size: smaller; color: gray;">
     Fig. (left) 50 pairs consisting of the original image (from the SVHN dataset) and
@@ -420,6 +484,94 @@ The Street View House Numbers dataset is modeled using a convolutional VAE with 
     starting point and the right-most column as the endpoint.
     (right) SVHN samples generated by randomly sampling the latent space followed by
     decoding.
+</p>
+
+
+### [Autoencoders] VQVAE
+Read the preliminaries
+[here](#discrete-representation-learning-with-vqvaes-with-autoregressive-prior).
+
+#### SVHN
+See the section for SVHN
+[here](#discrete-representation-learning-with-vqvaes-with-autoregressive-prior).
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step1_vqvae/epoch_20.png" alt="SVHN
+pairs: (original, reconstructed) pairs"
+    width="49%">
+    <img src="assets/vqvae_w_gpt2_prior/svhn/step2_gpt2/epoch_20.png"
+    alt="Unconditional samples generated using the autoregressive prior" width="49%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. SVHN Dataset. (Left) Step 1: VQVAE. 50 (original image, reconstructed) pairs. The
+reconstructed image is obtained by passing the original image through the VQVAE
+(encoder followed by decoder).
+    (Right) Step 2: Autoregressive GPT2 trained on VQVAE's learned latent
+representation. 100 unconditional samples generated by the autoregressive model
+which are then decoded from the learned discrete latent representations to the image space.
+</p>
+
+#### CIFAR-10
+
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step1_vqvae/epoch_1.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 1"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step1_vqvae/epoch_10.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 10"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step1_vqvae/epoch_20.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 20"
+    width="32%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. CIFAR-10 Dataset. Step 1: VQVAE.
+    50 (original image, reconstructed) pairs at the end of epoch 1 (left), epoch 10
+    (center) and epoch 20 (right) (out of total 20 epochs).
+    The reconstructed image is obtained by passing the original image through the
+    VQVAE (encoder followed by decoder).
+    One can notice how the reconstructed image gets closer to the original image as
+    the training progresses.
+</p>
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step2_gpt2/epoch_1.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 1"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step2_gpt2/epoch_10.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 10"
+    width="32%">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step2_gpt2/epoch_20.png"
+    alt="CIFAR-10 pairs: (original, reconstructed) pairs after epoch 20"
+    width="32%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. CIFAR-10 Dataset. Step 2: Autoregressive modeling of the prior using GPT2.
+    100 unconditional samples generated at the end of epoch 1 (left), epoch 10
+    (center) and epoch 20 (right) (out of total 20 epochs).
+    Sampling is performed by the autoregressive model in latent space. The VQVAE
+    from step 1 is then used to decode the latent space and decode to image space.
+    One can notice the improvement in the quality of the generated image as the
+    training progresses.
+</p>
+
+<p align="center">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step1_vqvae/epoch_20.png" alt="CIFAR-10
+pairs: (original, reconstructed) pairs"
+    width="49%">
+    <img src="assets/vqvae_w_gpt2_prior/cifar_10/step2_gpt2/epoch_20.png"
+    alt="Unconditional samples generated using the autoregressive prior" width="49%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. CIFAR-10 Dataset. (Left) Step 1: VQVAE. 50 (original image, reconstructed)
+pairs.
+The
+reconstructed image is obtained by passing the original image through the VQVAE
+(encoder followed by decoder).
+    (Right) Step 2: Autoregressive GPT2 trained on VQVAE's learned latent
+representation. 100 unconditional samples generated by the autoregressive model
+which are then decoded from the learned discrete latent representations to the image space.
 </p>
 
 ---
@@ -529,9 +681,10 @@ pre-commit run --all-files
 
 - [ ] Experiment with learning rate schedulers
 - [ ] No-code way to train using declarative YAML config
-- [ ] Experiment with VQ-VAE
+- [x] Experiment with VAEs
+- [x] Experiment with VQ-VAEs
 - [ ] Support LoRA and fine-tuning utilities
-- [ ] Find bigger GPUs and experiment on larger datasets
+- [ ] Find bigger GPUs and extend to larger datasets
 - [ ] Experiment with different positional embeddings
 
 
