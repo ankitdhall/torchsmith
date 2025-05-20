@@ -26,9 +26,7 @@ class Solver(ABC):
         return x
 
     @torch.no_grad()
-    def simulate_with_trajectory(
-        self, x: torch.Tensor, ts: torch.Tensor
-    ) -> torch.Tensor:
+    def simulate_trajectories(self, x: torch.Tensor, ts: torch.Tensor) -> torch.Tensor:
         """Returns the trajectory simulated by updating initial state `x` through
         timesteps ts[0] to ts[-1].
         """
@@ -47,7 +45,7 @@ class EulerSolver(Solver):
     .. math::
         dX_t = u_t(X_t) dt  \\quad \\rightarrow \\quad X_{t + h} = X_t + hu_t(X_t)
 
-    where :math:`h = \Delta t` is the step size.
+    where :math:`h = \\Delta t` is the step size.
     """
 
     def __init__(self, ode: ODE) -> None:

@@ -8,7 +8,7 @@ class ODE(ABC):
     """Ordinary Differential Equation.
     Let :math:`u` be a time-dependent vector field.
     .. math::
-        u: \\mathbb{R}^d \\times [0,1] \\to \mathbb{R}^d, \\quad (x,t) \\mapsto u_t(x)
+        u: \mathbb{R}^d \\times [0,1] \\to \mathbb{R}^d, \\quad (x,t) \mapsto u_t(x)
 
     Then the ODE is given by:
 
@@ -27,7 +27,7 @@ class SDE(ABC):
     """Stochastic Differential Equation.
     Let :math:`u` be a time-dependent vector field.
     .. math::
-        u: \\mathbb{R}^d \\times [0,1] \\to \mathbb{R}^d, \\quad (x,t) \\mapsto u_t(x)
+        u: \mathbb{R}^d \\times [0,1] \\to \mathbb{R}^d, \\quad (x,t) \mapsto u_t(x)
 
     and Brownian motion :math:`$(W_t)_{0 \le t \le 1}`
 
