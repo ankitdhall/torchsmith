@@ -15,7 +15,7 @@ class OUProcess(SDE):
 
     i.e.
     .. math::
-        dX_t = -\\theta X_t \, dt + \\sigma \, dW_t, \\quad X_0 = x_0.
+        dX_t = -\\theta X_t \\, dt + \\sigma \\, dW_t, \\quad X_0 = x_0.
     """
 
     def __init__(self, theta: float, sigma: float):
