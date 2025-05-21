@@ -9,6 +9,8 @@ class LangevinDynamics(SDE):
 
     .. math::
         dX_t = 0.5 * \\sigma^2 \\nabla \\log p(X_t) dt + \\sigma dW_t, \\quad X_0 = x_0.
+
+    where the score function is defined as :math:`\\nabla log p_{density}(x)`.
     """
 
     def __init__(self, sigma: float, density: Density):

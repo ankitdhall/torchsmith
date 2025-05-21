@@ -25,6 +25,7 @@ class GaussianMixture(torch.nn.Module, Sampleable, Density):
                 covariance_matrix=self.covariances,
                 validate_args=False,
             ),
+            validate_args=False,
         )
 
     def log_density(self, x: torch.Tensor) -> torch.Tensor:
