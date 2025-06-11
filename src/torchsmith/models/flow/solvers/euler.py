@@ -1,6 +1,6 @@
 import torch
 
-from torchsmith.models.flow.processes import ODE
+from torchsmith.models.flow.processes.base import ODE
 from torchsmith.models.flow.solvers.base import Solver
 
 

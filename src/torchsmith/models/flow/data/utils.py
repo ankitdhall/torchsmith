@@ -1,7 +1,11 @@
+from pathlib import Path
+from typing import Literal
 from typing import Optional
+from typing import cast
 
 import seaborn as sns
 import torch
+from celluloid import Camera
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
@@ -93,7 +97,9 @@ def visualize_trajectories(
     density: Density,
     timesteps: torch.Tensor,
     plot_every: int,
+    save_as: Literal["movie", "image"],
     bins: int = 200,
+    save_path: Path | str | None = None,
 ) -> None:
     """Visualizes the trajectories of the SDE/ODE solver.
 
@@ -111,6 +117,8 @@ def visualize_trajectories(
         timesteps: 1D tensor of time points for simulation.
         plot_every: Interval for selecting timesteps to plot.
         bins: Number of bins for density plots.
+        save_as: Whether to save the visualization as an image or a movie.
+        save_path: Path to save the visualization. Required if `save_as` is "movie".
     """
 
     x_0 = source_distribution.sample(num_samples)
@@ -124,16 +132,29 @@ def visualize_trajectories(
     )
     plot_timesteps = timesteps[indices_to_plot]
 
-    fig, axes = plt.subplots(
-        2, len(plot_timesteps), figsize=(8 * len(plot_timesteps), 16)
-    )
-    axes = axes.reshape((2, len(plot_timesteps)))
+    camera: Camera | None = None
+    if save_as == "image":
+        fig, axes = plt.subplots(
+            2, len(plot_timesteps), figsize=(8 * len(plot_timesteps), 16)
+        )
+    elif save_as == "movie":
+        if save_path is None:
+            raise ValueError(
+                "`save_path` must be provided for `save_as` is set to 'movie'."
+            )
+        fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+        camera = Camera(fig)
+    else:
+        raise ValueError(
+            f"Invalid `save_as` value: '{save_as}'. Use 'image' or 'movie'."
+        )
+
     for t_idx in range(len(plot_timesteps)):
         t = plot_timesteps[t_idx].item()
         x_t = xts[:, t_idx]
 
         # Step 1: Plot scatter x_t and target density.
-        scatter_ax = axes[0, t_idx]
+        scatter_ax = axes[0, t_idx] if save_as == "image" else axes[0]
         plot_density(
             density,
             show_contours=False,
@@ -155,7 +176,7 @@ def visualize_trajectories(
         scatter_ax.set_yticks([])
 
         # Step 2: Plot contours using x_t and target density.
-        kdeplot_ax = axes[1, t_idx]
+        kdeplot_ax = axes[1, t_idx] if save_as == "image" else axes[1]
         plot_density(
             density,
             show_contours=False,
@@ -173,4 +194,16 @@ def visualize_trajectories(
         kdeplot_ax.set_xlabel("")
         kdeplot_ax.set_ylabel("")
 
-    plt.show()
+        if save_as == "movie":
+            camera = cast(Camera, camera)
+            camera.snap()
+
+    if save_as == "movie":
+        camera = cast(Camera, camera)
+        animation = camera.animate()
+        animation.save(save_path)
+        plt.close()
+    else:
+        if save_path is not None:
+            plt.savefig(save_path)
+        plt.show()

@@ -2,7 +2,7 @@ import torch
 from matplotlib import pyplot as plt
 
 from torchsmith.models.flow.processes import SDE
-from torchsmith.models.flow.solvers import EulerMaruyamaSolver
+from torchsmith.models.flow.solvers.euler_maruyama import EulerMaruyamaSolver
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()

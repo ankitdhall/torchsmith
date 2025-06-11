@@ -1,3 +1,8 @@
+import contextlib
+from pathlib import Path
+from typing import Literal
+
+import pytest
 import torch
 
 from torchsmith.models.flow.data import Gaussian
@@ -32,7 +37,18 @@ def test_densities() -> None:
         )
 
 
-def test_visualize_trajectories() -> None:
+@pytest.mark.parametrize(
+    ["save_as", "filename", "is_valid"],
+    [
+        ("movie", "trajectories.mp4", True),
+        ("movie", None, False),
+        ("image", "trajectories.png", True),
+        ("image", None, True),
+    ],
+)
+def test_visualize_trajectories(
+    save_as: Literal["movie", "image"], filename: str, is_valid: bool, tmp_path: Path
+) -> None:
     source_distribution = Gaussian(mean=torch.zeros(2), cov=20 * torch.eye(2)).to(
         device
     )
@@ -42,7 +58,8 @@ def test_visualize_trajectories() -> None:
     sde = LangevinDynamics(sigma=10.0, density=target_distribution)
     solver = EulerMaruyamaSolver(sde)
 
-    with suppress_plot():
+    context = contextlib.nullcontext() if is_valid else pytest.raises(ValueError)
+    with suppress_plot(), context:
         visualize_trajectories(
             num_samples=100,
             source_distribution=source_distribution,
@@ -50,4 +67,8 @@ def test_visualize_trajectories() -> None:
             density=target_distribution,
             timesteps=torch.linspace(0, 15.0, 1000).to(device),
             plot_every=334,
+            save_as=save_as,
+            save_path=(tmp_path / filename) if filename is not None else None,
         )
+    if filename is not None and is_valid:
+        assert (tmp_path / filename).exists()
