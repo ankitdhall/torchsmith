@@ -46,7 +46,7 @@ def test_densities() -> None:
             "trajectories.mp4",
             True,
             marks=pytest.mark.skipif(
-                sys.version_info < (3, 11), reason="Requires Python 3.11 or higher"
+                sys.version_info < (3, 12), reason="Requires Python 3.12 or higher"
             ),
         ),
         pytest.param(
@@ -54,7 +54,7 @@ def test_densities() -> None:
             "trajectories.gif",
             True,
             marks=pytest.mark.skipif(
-                sys.version_info < (3, 11), reason="Requires Python 3.11 or higher"
+                sys.version_info < (3, 12), reason="Requires Python 3.12 or higher"
             ),
         ),
         ("movie", None, False),
