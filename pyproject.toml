@@ -23,7 +23,9 @@ dependencies = [
     "matplotlib>=3.10.0",
     "joblib>=1.4.2",
     "psutil>=7.0.0",
-    "huggingface_hub>=0.29.1"
+    "huggingface_hub>=0.29.1",
+    "seaborn>=0.13.2",
+    "celluloid>=0.2.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
