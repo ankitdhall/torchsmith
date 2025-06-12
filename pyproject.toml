@@ -25,6 +25,7 @@ dependencies = [
     "psutil>=7.0.0",
     "huggingface_hub>=0.29.1",
     "seaborn>=0.13.2",
+    "celluloid>=0.2.0",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
