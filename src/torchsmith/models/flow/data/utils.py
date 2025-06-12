@@ -7,6 +7,7 @@ import seaborn as sns
 import torch
 from celluloid import Camera
 from matplotlib import pyplot as plt
+from matplotlib.animation import ImageMagickWriter
 from matplotlib.axes import Axes
 
 from torchsmith.models.flow.data import Density
@@ -171,7 +172,10 @@ def visualize_trajectories(
             alpha=0.75,
             s=15,
         )
-        scatter_ax.set_title(f"Samples at t={t:.1f}", fontsize=15)
+        scatter_title = (
+            f"Samples at t={t:.1f}" if save_as == "image" else "Samples (over time)"
+        )
+        scatter_ax.set_title(scatter_title, fontsize=15)
         scatter_ax.set_xticks([])
         scatter_ax.set_yticks([])
 
@@ -188,7 +192,13 @@ def visualize_trajectories(
         sns.kdeplot(
             x=x_t[:, 0].cpu(), y=x_t[:, 1].cpu(), alpha=0.5, ax=kdeplot_ax, color="grey"
         )
-        kdeplot_ax.set_title(f"Density of Samples at t={t:.1f}", fontsize=15)
+
+        kdeplot_title = (
+            f"Density of Samples at t={t:.1f}"
+            if save_as == "image"
+            else "Density of Samples (over time)"
+        )
+        kdeplot_ax.set_title(kdeplot_title, fontsize=15)
         kdeplot_ax.set_xticks([])
         kdeplot_ax.set_yticks([])
         kdeplot_ax.set_xlabel("")
@@ -201,7 +211,11 @@ def visualize_trajectories(
     if save_as == "movie":
         camera = cast(Camera, camera)
         animation = camera.animate()
-        animation.save(save_path)
+        if Path(cast(str, save_path)).suffix == ".gif":
+            writer = ImageMagickWriter()
+            animation.save(save_path, writer=writer)
+        else:
+            animation.save(save_path)
         plt.close()
     else:
         if save_path is not None:

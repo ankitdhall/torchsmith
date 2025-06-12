@@ -41,6 +41,7 @@ def test_densities() -> None:
     ["save_as", "filename", "is_valid"],
     [
         ("movie", "trajectories.mp4", True),
+        ("movie", "trajectories.gif", True),
         ("movie", None, False),
         ("image", "trajectories.png", True),
         ("image", None, True),
@@ -61,12 +62,12 @@ def test_visualize_trajectories(
     context = contextlib.nullcontext() if is_valid else pytest.raises(ValueError)
     with suppress_plot(), context:
         visualize_trajectories(
-            num_samples=100,
+            num_samples=1000,
             source_distribution=source_distribution,
             solver=solver,
             density=target_distribution,
-            timesteps=torch.linspace(0, 15.0, 1000).to(device),
-            plot_every=334,
+            timesteps=torch.linspace(0, 5.0, 1000).to(device),
+            plot_every=100,
             save_as=save_as,
             save_path=(tmp_path / filename) if filename is not None else None,
         )
