@@ -14,7 +14,8 @@
 ## 🔥 Why Torchsmith?
 Torchsmith is a minimalist library that focuses on understanding by building.
 Torchsmith builds multimodal modern generative AI, such as **VAEs**, **VQVAEs**,
-**autoregressive** and **diffusion models** trained on image, text, and image-text pairs.
+**autoregressive**,  **diffusion models** and **flow models** trained on image, text, and
+image-text pairs.
 
 Torchsmith is built using basic [PyTorch](https://pytorch.org/) operations,
 without relying on high-level abstractions.
@@ -23,8 +24,6 @@ Here you will find a bare-bones implementation of various building blocks of
 modern-day machine learning such as [attention](https://arxiv.org/abs/1706.03762),
 positional encoding, transformers,
 learning rate schedulers, various text and image tokenizers, to name a few.
-
-Torchsmith was inspired by [Berkeley's CS294-158](https://sites.google.com/view/berkeley-cs294-158-sp24/home).
 
 ## 🎬 Torchsmith In Action
 
@@ -176,6 +175,26 @@ top of the VQVAE's learned latent representation.
     from step 1 is then used to decode the latent space and decode to image space.
     One can notice the improvement in the quality of the generated image as the
     training progresses.
+</p>
+
+### Transforming Noise To Arbitrary Data Distributions With ODEs and SDEs
+Transform noise (i.e. Gaussian distribution) to a target distribution by
+simulating flows with ODEs and SDEs.
+<p align="center">
+    <img src="assets/flows/trajectories_mixture_of_gaussians.gif"
+    alt="SVHN pairs: (original, reconstructed) pairs after epoch 1"
+    width="100%">
+</p>
+<p align="center" style="font-size: smaller; color: gray;">
+    Fig. Simulation of an SDE (Langevin dynamics) that transforms noise (a Gaussian
+    distribution) to a target distribution (here, a mixture of Gaussians) over time.
+    One can see how the points start out normally distributed and over time are
+    transformed to move towards the target distribution (blue shaded region). The
+    Langevin dynamics involve both a drift and diffusion coefficient.
+    Blue shaded region: Target distribution (mixture of Gaussians) (seen on both).
+    Black 'x' markers: Transformed samples at time t (seen on the left).
+    Contour lines: Density estimation of the transformed distribution at time t
+(seen on the right).
 </p>
 
 
@@ -693,3 +712,5 @@ Inspired by:
 - Works such as [minGPT](https://github.com/karpathy/minGPT) and [nanoGPT](https://github.com/karpathy/nanoGPT).
 - [Berkeley's CS294-158 Deep Unsupervised Learning](https://sites.google.com/view/berkeley-cs294-158-sp24/home). Also, thanks to them for the
   Colored MNIST dataset and the pre-trained VQ-VAEs.
+- [MIT's 6.S184](https://diffusion.csail.mit.edu/) and
+[Flow matching](https://arxiv.org/abs/2412.06264)
