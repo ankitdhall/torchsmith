@@ -1,5 +1,4 @@
 import contextlib
-import sys
 from pathlib import Path
 from typing import Literal
 
@@ -41,22 +40,8 @@ def test_densities() -> None:
 @pytest.mark.parametrize(
     ["save_as", "filename", "is_valid"],
     [
-        pytest.param(
-            "movie",
-            "trajectories.mp4",
-            True,
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 12), reason="Requires Python 3.12 or higher"
-            ),
-        ),
-        pytest.param(
-            "movie",
-            "trajectories.gif",
-            True,
-            marks=pytest.mark.skipif(
-                sys.version_info < (3, 12), reason="Requires Python 3.12 or higher"
-            ),
-        ),
+        ("movie", "trajectories.mp4", True),
+        ("movie", "trajectories.gif", True),
         ("movie", None, False),
         ("image", "trajectories.png", True),
         ("image", None, True),
