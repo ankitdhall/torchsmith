@@ -26,6 +26,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install dependencies for image and video processing
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+
       - name: Install uv
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
