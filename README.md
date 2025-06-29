@@ -1,15 +1,12 @@
-<p align="center">
-  <picture>
-    <img alt="torchsmith" src="assets/torchsmith_logo_small.jpg" width="350">
-  </picture>
-</p>
-<p align="center">
-    <a><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
-    <a><img alt="Test Coverage" src=".badges/coverage-badge.svg"></a>
-</p>
-<h3 align="center">
-    <p>Understanding Generative AI By Building It From Scratch</p>
-</h3>
+![torchsmith](assets/torchsmith_logo_small_350px.jpg)
+
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Test Coverage](.badges/coverage-badge.svg)
+![torch](https://img.shields.io/badge/Python-3.10_|_3.11_|_3.12_|_3.13-blue.svg)
+![torch](https://img.shields.io/badge/Pytorch-orange.svg)
+### Understanding Generative AI By Building It From Scratch
+
+---
 
 ## 🔥 Why Torchsmith?
 Torchsmith is a minimalist library that focuses on understanding by building.
@@ -177,7 +174,7 @@ top of the VQVAE's learned latent representation.
     training progresses.
 </p>
 
-### Transforming Noise To Arbitrary Data Distributions With ODEs and SDEs
+### [WIP] Flow Matching 🚧
 Transform noise (i.e. Gaussian distribution) to a target distribution by
 simulating flows with ODEs and SDEs.
 <p align="center">
@@ -702,6 +699,8 @@ pre-commit run --all-files
 - [ ] No-code way to train using declarative YAML config
 - [x] Experiment with VAEs
 - [x] Experiment with VQ-VAEs
+- [ ] [WIP] Flow matching 🚧
+- [ ] Experiment with VQ-GANs
 - [ ] Support LoRA and fine-tuning utilities
 - [ ] Find bigger GPUs and extend to larger datasets
 - [ ] Experiment with different positional embeddings
