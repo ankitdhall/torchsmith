@@ -2,6 +2,7 @@
 
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Test Coverage](.badges/coverage-badge.svg)
+![torch](https://img.shields.io/badge/Python-3.10_|_3.11_|_3.12_|_3.13-blue.svg)
 ![torch](https://img.shields.io/badge/Pytorch-orange.svg)
 ### Understanding Generative AI By Building It From Scratch
 
@@ -173,7 +174,7 @@ top of the VQVAE's learned latent representation.
     training progresses.
 </p>
 
-### Transforming Noise To Arbitrary Data Distributions With ODEs and SDEs
+### [WIP] Flow Matching 🚧
 Transform noise (i.e. Gaussian distribution) to a target distribution by
 simulating flows with ODEs and SDEs.
 <p align="center">
@@ -698,6 +699,8 @@ pre-commit run --all-files
 - [ ] No-code way to train using declarative YAML config
 - [x] Experiment with VAEs
 - [x] Experiment with VQ-VAEs
+- [ ] [WIP] Flow matching 🚧
+- [ ] Experiment with VQ-GANs
 - [ ] Support LoRA and fine-tuning utilities
 - [ ] Find bigger GPUs and extend to larger datasets
 - [ ] Experiment with different positional embeddings
