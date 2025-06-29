@@ -1,15 +1,17 @@
+<h3 align="center">
+    <p>Understanding Generative AI By Building It From Scratch</p>
+</h3>
+<p align="center">
+    <a><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+    <a><img alt="Test Coverage" src=".badges/coverage-badge.svg"></a>
+</p>
 <p align="center">
   <picture>
     <img alt="torchsmith" src="assets/torchsmith_logo_small.jpg" width="350">
   </picture>
 </p>
-<p align="center">
-    <a><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
-    <a><img alt="Test Coverage" src=".badges/coverage-badge.svg"></a>
-</p>
-<h3 align="center">
-    <p>Understanding Generative AI By Building It From Scratch</p>
-</h3>
+
+---
 
 ## 🔥 Why Torchsmith?
 Torchsmith is a minimalist library that focuses on understanding by building.
