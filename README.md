@@ -1,15 +1,9 @@
-<h3 align="center">
-    <p>Understanding Generative AI By Building It From Scratch</p>
-</h3>
-<p align="center">
-    <a><img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
-    <a><img alt="Test Coverage" src=".badges/coverage-badge.svg"></a>
-</p>
-<p align="center">
-  <picture>
-    <img alt="torchsmith" src="assets/torchsmith_logo_small.jpg" width="350">
-  </picture>
-</p>
+![torchsmith](assets/torchsmith_logo_small_350px.jpg)
+
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Test Coverage](.badges/coverage-badge.svg)
+![torch](https://img.shields.io/badge/Pytorch-orange.svg)
+### Understanding Generative AI By Building It From Scratch
 
 ---
 
