@@ -53,12 +53,6 @@ class GaussianConditionalProbabilityPath(ConditionalProbabilityPath):
         alpha_dot = self.alpha.dt(t)
         beta = self.beta(t)
         beta_dot = self.beta.dt(t)
-        print("alpha,alpha_dot,beta,beta_dot,")
-
-        print(alpha.shape, alpha_dot.shape, beta.shape, beta_dot.shape)
-
-        print("x.shape, z.shape: ", x.shape, z.shape)
-
         return (alpha_dot - alpha * beta_dot / beta) * z + x * beta_dot / beta
 
     def conditional_score(

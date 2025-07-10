@@ -1,3 +1,6 @@
+from typing import Literal
+
+import pytest
 from matplotlib import pyplot as plt
 
 from torchsmith.models.flow.data import Gaussian
@@ -7,13 +10,11 @@ from torchsmith.models.flow.paths.gaussian_conditional_probability_path import (
 )
 from torchsmith.models.flow.paths.schedulers import LinearAlpha
 from torchsmith.models.flow.paths.schedulers import SquareRootBeta
-from torchsmith.models.flow.paths.visualize import (
-    visualize_conditional_probability_path,
-)
-from torchsmith.models.flow.paths.visualize import (
+from torchsmith.models.flow.visualize import visualize_conditional_probability_path
+from torchsmith.models.flow.visualize import (
     visualize_conditional_probability_trajectories,
 )
-from torchsmith.models.flow.paths.visualize import visualize_density
+from torchsmith.models.flow.visualize import visualize_density
 from torchsmith.utils.plotting import suppress_plot
 from torchsmith.utils.pytorch import get_device
 
@@ -43,7 +44,8 @@ def test_visualize_conditional_probability_path() -> None:
         plt.show()
 
 
-def test_visualize_trajectories() -> None:
+@pytest.mark.parametrize("mode", ["ode", "sde"])
+def test_visualize_trajectories(mode: Literal["ode", "sde"]) -> None:
     target_scale = 10.0
     target_std = 1.0
     plot_limits = 15.0
@@ -55,7 +57,8 @@ def test_visualize_trajectories() -> None:
         p_source=p_source, p_data=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
     ).to(device)
     z = path.sample_conditioning_variable(1)
-    with suppress_plot():
+    # with suppress_plot():
+    if True:
         fig, axes = plt.subplots(1, 2, figsize=(36, 12))
         visualize_density(
             p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[0]
@@ -67,6 +70,6 @@ def test_visualize_trajectories() -> None:
             p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[1]
         )
         visualize_conditional_probability_trajectories(
-            path=path, z=z, plot_limits=plot_limits, ax=axes[1]
+            path=path, z=z, plot_limits=plot_limits, ax=axes[1], mode=mode
         )
         plt.show()

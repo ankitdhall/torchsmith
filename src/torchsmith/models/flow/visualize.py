@@ -1,3 +1,4 @@
+from typing import Literal
 from typing import Optional
 
 import torch
@@ -15,7 +16,12 @@ from torchsmith.models.flow.paths.gaussian_conditional_probability_path import (
 from torchsmith.models.flow.processes.conditional_vector_field import (
     ConditionalVectorFieldODE,
 )
+from torchsmith.models.flow.processes.conditional_vector_field import (
+    ConditionalVectorFieldSDE,
+)
+from torchsmith.models.flow.solvers import EulerMaruyamaSolver
 from torchsmith.models.flow.solvers import EulerSolver
+from torchsmith.models.flow.solvers import Solver
 from torchsmith.utils.pytorch import get_device
 
 device = get_device()
@@ -96,22 +102,31 @@ def visualize_conditional_probability_path(
 def visualize_conditional_probability_trajectories(
     path: ConditionalProbabilityPath,
     *,
+    mode: Literal["ode", "sde"],
     z: torch.Tensor,
     plot_limits: float,
     num_trajectories: int = 15,
     num_timesteps: int = 1000,
     ax: Optional[Axes] = None,
+    sigma: float = 2.5,  # Only used for SDE mode.
 ) -> Axes:
     if ax is None:
         ax = plt.gca()
 
-    ode = ConditionalVectorFieldODE(path, z)
-    ode_solver = EulerSolver(ode)
+    if mode == "ode":
+        ode = ConditionalVectorFieldODE(path, z)
+        solver: Solver = EulerSolver(ode)
+    elif mode == "sde":
+        sde = ConditionalVectorFieldSDE(path, z=z, sigma=sigma)
+        solver = EulerMaruyamaSolver(sde)
+    else:
+        raise ValueError(f"Invalid mode: {mode}. Use 'ode' or 'sde'.")
+
     x_0 = path.p_source.sample(num_trajectories)  # (num_samples, 2)
     timesteps = torch.linspace(
         0.0, 1.0, num_timesteps, device=device
     )  # (num_timesteps,)
-    x_t = ode_solver.simulate_trajectories(
+    x_t = solver.simulate_trajectories(
         x_0, timesteps
     )  # (num_samples, num_timesteps, dim)
 
@@ -121,7 +136,7 @@ def visualize_conditional_probability_trajectories(
     ax.set_ylim(*y_bounds)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_title("Trajectories of Conditional ODE", fontsize=20)
+    ax.set_title(f"Trajectories of Conditional {mode.upper()}", fontsize=20)
     ax.scatter(
         z[:, 0].cpu(),
         z[:, 1].cpu(),
