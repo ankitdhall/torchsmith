@@ -5,6 +5,7 @@ import torch
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
+from torchsmith.models.flow.data.base import Sampleable
 from torchsmith.models.flow.data.base import SampleableDensity
 from torchsmith.models.flow.data.utils import plot_density
 from torchsmith.models.flow.paths.conditional_probability_path import (
@@ -154,5 +155,131 @@ def visualize_conditional_probability_trajectories(
             alpha=0.5,
             color="black",
         )
-    ax.legend(prop={"size": 24}, loc="upper right", markerscale=1.8)
+    return ax
+
+
+def visualize_generated_trajectories(
+    solver: Solver,
+    *,
+    p_source: Sampleable,
+    plot_limits: float,
+    num_trajectories: int = 15,
+    num_timesteps: int = 1000,
+    ax: Optional[Axes] = None,
+) -> Axes:
+    if ax is None:
+        ax = plt.gca()
+
+    if isinstance(solver, EulerSolver):
+        mode = "ode"
+    elif isinstance(solver, EulerMaruyamaSolver):
+        mode = "sde"
+    else:
+        raise ValueError(f"Invalid solver: {solver}")
+
+    x_0 = p_source.sample(num_trajectories)  # (num_samples, 2)
+    timesteps = torch.linspace(0.0, 1.0, num_timesteps, device=device)
+    x_t = solver.simulate_trajectories(
+        x_0, timesteps
+    )  # (num_samples, num_timesteps, dim)
+
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+    ax.set_xlim(*x_bounds)
+    ax.set_ylim(*y_bounds)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title(f"Trajectories of Conditional {mode.upper()}", fontsize=20)
+
+    for trajectory_index in range(num_trajectories):
+        ax.plot(
+            x_t[trajectory_index, :, 0].detach().cpu(),
+            x_t[trajectory_index, :, 1].detach().cpu(),
+            alpha=0.5,
+            color="black",
+        )
+    return ax
+
+
+def visualize_marginal_probability_path(
+    path: GaussianConditionalProbabilityPath,
+    *,
+    num_samples: int,
+    plot_limits: float,
+    num_time_intervals: int = 7,
+    ax: Axes | None = None,
+) -> Axes:
+    if ax is None:
+        ax = plt.gca()
+
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+
+    ax.set_xlim(*x_bounds)
+    ax.set_ylim(*y_bounds)
+    ax.set_title("Gaussian Marginal Probability Path", fontsize=20)
+
+    timesteps = torch.linspace(0.0, 1.0, num_time_intervals).to(device)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # Plot marginal probability path at each intermediate t
+    for t in timesteps:
+        marginal_samples = path.sample_marginal_path(  # (num_samples, 1)
+            t.expand(num_samples, 1)
+        )
+        ax.scatter(
+            marginal_samples[:, 0].cpu(),
+            marginal_samples[:, 1].cpu(),
+            alpha=0.25,
+            s=8,
+            label=f"t={t.item():.1f}",
+        )
+
+    ax.legend(prop={"size": 18}, markerscale=3)
+    return ax
+
+
+def visualize_samples_from_learned_marginal(
+    path: GaussianConditionalProbabilityPath,
+    *,
+    solver: Solver,
+    plot_limits: float,
+    num_samples: int = 1000,
+    num_time_intervals: int = 7,
+    ax: Axes | None = None,
+) -> Axes:
+    if ax is None:
+        ax = plt.gca()
+
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+
+    ax.set_xlim(*x_bounds)
+    ax.set_ylim(*y_bounds)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    solver_type = "SDE" if isinstance(solver, EulerMaruyamaSolver) else "ODE"
+    ax.set_title(f"Samples from Learned Marginal {solver_type}", fontsize=20)
+
+    timesteps = torch.linspace(0.0, 1.0, 1000).to(device)
+
+    # Construct integrator and plot trajectories
+    x0 = path.p_source.sample(num_samples)  # (num_samples, 2)
+    xts = solver.simulate_trajectories(x0, timesteps)  # (bs, nts, dim)
+
+    for t_index in range(
+        0, timesteps.shape[0], timesteps.shape[0] // (num_time_intervals - 1)
+    ):
+        t = timesteps[t_index]
+        ax.scatter(
+            xts[:, t_index, 0].cpu(),
+            xts[:, t_index, 1].cpu(),
+            alpha=0.25,
+            s=8,
+            label=f"t={t.item():.1f}",
+        )
+
+    ax.legend(prop={"size": 18}, markerscale=3)
     return ax

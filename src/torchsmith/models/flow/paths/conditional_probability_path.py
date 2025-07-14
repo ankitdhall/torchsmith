@@ -14,6 +14,7 @@ class ConditionalProbabilityPath(torch.nn.Module, ABC):
 
     def sample_marginal_path(self, t: torch.Tensor) -> torch.Tensor:
         """Samples from the marginal distribution p_t(x) = p_t(x|z) p(z)"""
+        assert t.dim() == 2 and t.shape[1] == 1, "t must be of shape (num_samples, 1)"
         num_samples = t.shape[0]
         # Sample conditioning variable z ~ p(z)
         z = self.sample_conditioning_variable(num_samples)  # (num_samples, dim)

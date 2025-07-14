@@ -57,8 +57,7 @@ def test_visualize_trajectories(mode: Literal["ode", "sde"]) -> None:
         p_source=p_source, p_data=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
     ).to(device)
     z = path.sample_conditioning_variable(1)
-    # with suppress_plot():
-    if True:
+    with suppress_plot():
         fig, axes = plt.subplots(1, 2, figsize=(36, 12))
         visualize_density(
             p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[0]
