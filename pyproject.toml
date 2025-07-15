@@ -18,7 +18,9 @@ dependencies = [
     "torchvision>=0.19.1",
     "scipy>=1.15.2",
     "einops>=0.8.0",
-    "datasets>=3.3.2",
+    # Restricting to <=3.6.0 due breaking change (scripts not supported:
+    # arctic monkeys dataset loading fails)
+    "datasets>=3.3.2,<=3.6.0",
     "pre-commit>=4.1.0",
     "matplotlib>=3.10.0",
     "joblib>=1.4.2",
