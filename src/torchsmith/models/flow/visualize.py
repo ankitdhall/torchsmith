@@ -34,7 +34,7 @@ def visualize_density(
     p_data: SampleableDensity,
     plot_limits: float,
     ax: Axes | None = None,
-):
+) -> Axes:
     if ax is None:
         ax = plt.gca()
 
@@ -55,6 +55,7 @@ def visualize_density(
         ax=ax,
         density_kwargs=dict(vmin=-15, alpha=0.25, cmap=plt.get_cmap("Blues")),
     )
+    return ax
 
 
 def visualize_conditional_probability_path(
@@ -283,3 +284,56 @@ def visualize_samples_from_learned_marginal(
 
     ax.legend(prop={"size": 18}, markerscale=3)
     return ax
+
+
+def visualize_field_across_time_and_space(
+    model: torch.nn.Module,
+    *,
+    path: ConditionalProbabilityPath,
+    num_marginals: int,
+    plot_limits: float,
+    num_bins: int,
+    title: str,
+) -> Axes:
+    fig, axes = plt.subplots(1, num_marginals, figsize=(6 * num_marginals, 6))
+
+    timesteps = torch.linspace(0.0, 1.0, num_marginals).to(device)
+    xs = torch.linspace(-plot_limits, plot_limits, num_bins).to(device)
+    ys = torch.linspace(-plot_limits, plot_limits, num_bins).to(device)
+    xx, yy = torch.meshgrid(xs, ys)
+    xx = xx.reshape(-1, 1)
+    yy = yy.reshape(-1, 1)
+    xy = torch.cat([xx, yy], dim=-1)
+
+    for t_index in range(num_marginals):
+        t = timesteps[t_index]
+        batch_size = num_bins**2
+        tt = t.view(1, 1).expand(batch_size, 1)
+
+        # Learned vector field/scores
+        learned_field = model(xy, tt)
+        learned_field_x = learned_field[:, 0]
+        learned_field_y = learned_field[:, 1]
+
+        ax = axes[t_index]
+        ax.quiver(
+            xx.detach().cpu(),
+            yy.detach().cpu(),
+            learned_field_x.detach().cpu(),
+            learned_field_y.detach().cpu(),
+            scale=125,
+            alpha=0.5,
+        )
+
+        ax = visualize_density(
+            p_source=path.p_source,  # type: ignore
+            p_data=path.p_target,  # type: ignore
+            plot_limits=plot_limits,
+            ax=ax,
+        )
+        ax.set_title(f"At t={t.item():.2f}")
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    fig.suptitle(title, fontsize=20)
+    return axes

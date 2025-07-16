@@ -12,7 +12,9 @@ from torchsmith.models.flow.train.flow_matching import ConditionalFlowMatchingTr
 from torchsmith.models.flow.train.model import MLPForMatching
 from torchsmith.models.flow.train.score_matching import ConditionalScoreMatchingTrainer
 from torchsmith.models.flow.train.score_matching import LearnedLangevinFlowSDE
+from torchsmith.models.flow.train.score_matching import ScoreFromVectorField
 from torchsmith.models.flow.visualize import visualize_density
+from torchsmith.models.flow.visualize import visualize_field_across_time_and_space
 from torchsmith.models.flow.visualize import visualize_generated_trajectories
 from torchsmith.models.flow.visualize import visualize_marginal_probability_path
 from torchsmith.models.flow.visualize import visualize_samples_from_learned_marginal
@@ -91,5 +93,33 @@ visualize_generated_trajectories(
     plot_limits=plot_limits,
     num_trajectories=200,
     ax=axes[2],
+)
+plt.show()
+
+#####################################################################
+# Compare Learned Score and Score Derived From Learned Vector Field #
+#####################################################################
+
+score_model_from_vector_field = ScoreFromVectorField(
+    vector_field=flow_model.eval(), alpha=path.alpha, beta=path.beta
+).to(device)
+
+ax = visualize_field_across_time_and_space(
+    score_model,
+    path=path,
+    num_marginals=5,
+    plot_limits=plot_limits,
+    num_bins=40,
+    title="Learned Score Field",
+)
+plt.show()
+
+ax = visualize_field_across_time_and_space(
+    score_model_from_vector_field,
+    path=path,
+    num_marginals=5,
+    plot_limits=plot_limits,
+    num_bins=40,
+    title="Score Field Derived From Learned Vector Field",
 )
 plt.show()

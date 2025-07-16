@@ -7,6 +7,7 @@ from torchsmith.models.flow.data import Sampleable
 
 
 class ConditionalProbabilityPath(torch.nn.Module, ABC):
+    # TODO: check typing; should it be Sampleable or SampleableDensity?
     def __init__(self, p_source: Sampleable, p_target: Sampleable) -> None:
         super().__init__()
         self.p_source = p_source

@@ -3,6 +3,8 @@ import torch
 from torchsmith.models.flow.paths.conditional_probability_path import (
     ConditionalProbabilityPath,
 )
+from torchsmith.models.flow.paths.schedulers import Alpha
+from torchsmith.models.flow.paths.schedulers import Beta
 from torchsmith.models.flow.processes import SDE
 from torchsmith.models.flow.train.base_trainer import FlowMatchingTrainer
 
@@ -11,7 +13,7 @@ class LearnedLangevinFlowSDE(SDE):
     """Langevin Flow SDE.
 
     .. math::
-        dX_t = [ u_t^{\\theta}(x) + 0.5 * \sigma^2 s_t^{\\theta}(x) ] dt + \sigma dW_t
+        dX_t = [ u_t^{\\theta}(x) + 0.5 * \\sigma^2 s_t^{\\theta}(x) ] dt + \\sigma dW_t
     """
 
     def __init__(
@@ -51,3 +53,21 @@ class ConditionalScoreMatchingTrainer(FlowMatchingTrainer):
         s_ref = self.path.conditional_score(x, z, t)  # (num_samples, dim)
 
         return torch.nn.functional.mse_loss(s_theta, s_ref)
+
+
+class ScoreFromVectorField(torch.nn.Module):
+    """Parameterization of score via learned vector field.
+    Note: this is only valid in the special case of a Gaussian conditional probability
+    path.
+    """
+
+    def __init__(self, vector_field: torch.nn.Module, alpha: Alpha, beta: Beta) -> None:
+        super().__init__()
+        self.vector_field = vector_field
+        self.alpha = alpha
+        self.beta = beta
+
+    def forward(self, x: torch.Tensor, t: torch.Tensor) -> torch.Tensor:
+        alpha = self.alpha(t)
+        alpha_dot = self.alpha.dt(t)
+        return (alpha * self.vector_field(x, t) - alpha_dot * x) / (1.0 - t / 2)
