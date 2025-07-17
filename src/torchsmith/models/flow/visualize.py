@@ -5,14 +5,12 @@ import torch
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
+from torchsmith.models.flow.data.base import Density
 from torchsmith.models.flow.data.base import Sampleable
 from torchsmith.models.flow.data.base import SampleableDensity
 from torchsmith.models.flow.data.utils import plot_density
 from torchsmith.models.flow.paths.conditional_probability_path import (
     ConditionalProbabilityPath,
-)
-from torchsmith.models.flow.paths.gaussian_conditional_probability_path import (
-    GaussianConditionalProbabilityPath,
 )
 from torchsmith.models.flow.processes.conditional_vector_field import (
     ConditionalVectorFieldODE,
@@ -58,11 +56,12 @@ def visualize_density(
     return ax
 
 
-def visualize_conditional_probability_path(
-    path: GaussianConditionalProbabilityPath,
+def visualize_conditional_probability_path_overlaid(
+    path: ConditionalProbabilityPath,
     *,
     z: torch.Tensor,
     plot_limits: float,
+    num_samples: int = 1000,
     ax: Axes | None = None,
 ) -> Axes:
     assert z.shape[0] == 1, "z must be a single conditioning variable (1, dim)"
@@ -74,7 +73,7 @@ def visualize_conditional_probability_path(
 
     ax.set_xlim(*x_bounds)
     ax.set_ylim(*y_bounds)
-    ax.set_title("Gaussian Conditional Probability Path")
+    ax.set_title("Conditional Probability Path (Ground Truth)", fontsize=20)
 
     timesteps = torch.linspace(0.0, 1.0, 7).to(device)
 
@@ -84,7 +83,6 @@ def visualize_conditional_probability_path(
     ax.set_yticks([])
 
     # Plot conditional probability path at each intermediate t
-    num_samples = 1000
     for t in timesteps:
         z_batch = z.expand(num_samples, 2)
         t_batch = t.unsqueeze(0).expand(num_samples, 1)  # (num_samples, 1)
@@ -98,6 +96,44 @@ def visualize_conditional_probability_path(
         )
 
     ax.legend(prop={"size": 18}, markerscale=3)
+    return ax
+
+
+def visualize_conditional_probability_path(
+    path: ConditionalProbabilityPath,
+    *,
+    z: torch.Tensor,
+    plot_limits: float,
+    num_time_intervals: int = 5,
+    num_samples: int = 1000,
+) -> Axes:
+    assert z.shape[0] == 1, "z must be a single conditioning variable (1, dim)"
+    fig, ax = plt.subplots(1, num_time_intervals, figsize=(3 * num_time_intervals, 3))
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+
+    fig.suptitle("Conditional Probability Path (Ground Truth)", fontsize=20)
+
+    timesteps = torch.linspace(0.0, 1.0, num_time_intervals).to(device)
+
+    # Plot conditional probability path at each intermediate t
+    for index in range(timesteps.shape[0]):
+        t = timesteps[index]
+        z_batch = z.expand(num_samples, 2)
+        t_batch = t.unsqueeze(0).expand(num_samples, 1)  # (num_samples, 1)
+        samples = path.sample_conditional_path(z_batch, t_batch)  # (num_samples, 2)
+        ax[index].scatter(
+            samples[:, 0].cpu(),
+            samples[:, 1].cpu(),
+            alpha=0.25,
+            s=8,
+        )
+        ax[index].set_title(f"t={t.item():.1f}")
+        ax[index].set_xlim(*x_bounds)
+        ax[index].set_ylim(*y_bounds)
+        ax[index].set_xticks([])
+        ax[index].set_yticks([])
+
     return ax
 
 
@@ -202,8 +238,8 @@ def visualize_generated_trajectories(
     return ax
 
 
-def visualize_marginal_probability_path(
-    path: GaussianConditionalProbabilityPath,
+def visualize_marginal_probability_path_overlaid(
+    path: ConditionalProbabilityPath,
     *,
     num_samples: int,
     plot_limits: float,
@@ -242,8 +278,44 @@ def visualize_marginal_probability_path(
     return ax
 
 
-def visualize_samples_from_learned_marginal(
-    path: GaussianConditionalProbabilityPath,
+def visualize_marginal_probability_path(
+    path: ConditionalProbabilityPath,
+    *,
+    num_samples: int,
+    plot_limits: float,
+    num_time_intervals: int = 5,
+) -> Axes:
+    fig, ax = plt.subplots(1, num_time_intervals, figsize=(3 * num_time_intervals, 3))
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+
+    fig.suptitle("Marginal Probability Path (Ground Truth)", fontsize=20)
+
+    timesteps = torch.linspace(0.0, 1.0, num_time_intervals).to(device)
+
+    # Plot marginal probability path at each intermediate t
+    for index in range(timesteps.shape[0]):
+        t = timesteps[index]
+        marginal_samples = path.sample_marginal_path(  # (num_samples, 1)
+            t.expand(num_samples, 1)
+        )
+        ax[index].scatter(
+            marginal_samples[:, 0].cpu(),
+            marginal_samples[:, 1].cpu(),
+            alpha=0.25,
+            s=8,
+        )
+        ax[index].set_title(f"t={t.item():.1f}")
+        ax[index].set_xlim(*x_bounds)
+        ax[index].set_ylim(*y_bounds)
+        ax[index].set_xticks([])
+        ax[index].set_yticks([])
+
+    return ax
+
+
+def visualize_samples_from_learned_marginal_overlaid(
+    path: ConditionalProbabilityPath,
     *,
     solver: Solver,
     plot_limits: float,
@@ -286,6 +358,46 @@ def visualize_samples_from_learned_marginal(
     return ax
 
 
+def visualize_samples_from_learned_marginal(
+    path: ConditionalProbabilityPath,
+    *,
+    solver: Solver,
+    plot_limits: float,
+    num_samples: int = 1000,
+    num_time_intervals: int = 5,
+) -> Axes:
+    fig, ax = plt.subplots(1, num_time_intervals, figsize=(3 * num_time_intervals, 3))
+    x_bounds = [-plot_limits, plot_limits]
+    y_bounds = [-plot_limits, plot_limits]
+
+    solver_type = "SDE" if isinstance(solver, EulerMaruyamaSolver) else "ODE"
+    fig.suptitle(f"Samples from Learned Marginal {solver_type}", fontsize=20)
+
+    timesteps = torch.linspace(0.0, 1.0, 1000).to(device)
+
+    # Construct integrator and plot trajectories
+    x0 = path.p_source.sample(num_samples)  # (num_samples, 2)
+    xts = solver.simulate_trajectories(x0, timesteps)  # (bs, nts, dim)
+
+    for plot_index, index in enumerate(
+        range(0, timesteps.shape[0], timesteps.shape[0] // num_time_intervals)
+    ):
+        t = timesteps[index]
+        ax[plot_index].scatter(
+            xts[:, index, 0].cpu(),
+            xts[:, index, 1].cpu(),
+            alpha=0.25,
+            s=8,
+        )
+        ax[plot_index].set_title(f"t={t.item():.1f}")
+        ax[plot_index].set_xlim(*x_bounds)
+        ax[plot_index].set_ylim(*y_bounds)
+        ax[plot_index].set_xticks([])
+        ax[plot_index].set_yticks([])
+
+    return ax
+
+
 def visualize_field_across_time_and_space(
     model: torch.nn.Module,
     *,
@@ -325,12 +437,13 @@ def visualize_field_across_time_and_space(
             alpha=0.5,
         )
 
-        ax = visualize_density(
-            p_source=path.p_source,  # type: ignore
-            p_data=path.p_target,  # type: ignore
-            plot_limits=plot_limits,
-            ax=ax,
-        )
+        if isinstance(path.p_source, Density) and isinstance(path.p_target, Density):
+            ax = visualize_density(
+                p_source=path.p_source,  # type: ignore
+                p_data=path.p_target,  # type: ignore
+                plot_limits=plot_limits,
+                ax=ax,
+            )
         ax.set_title(f"At t={t.item():.2f}")
         ax.set_xticks([])
         ax.set_yticks([])

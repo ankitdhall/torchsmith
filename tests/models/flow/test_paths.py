@@ -10,7 +10,9 @@ from torchsmith.models.flow.paths.gaussian_conditional_probability_path import (
 )
 from torchsmith.models.flow.paths.schedulers import LinearAlpha
 from torchsmith.models.flow.paths.schedulers import SquareRootBeta
-from torchsmith.models.flow.visualize import visualize_conditional_probability_path
+from torchsmith.models.flow.visualize import (
+    visualize_conditional_probability_path_overlaid,
+)
 from torchsmith.models.flow.visualize import (
     visualize_conditional_probability_trajectories,
 )
@@ -30,12 +32,12 @@ def test_visualize_conditional_probability_path() -> None:
         num_modes=5, std=target_std, scale=target_scale
     ).to(device)
     path = GaussianConditionalProbabilityPath(
-        p_source=p_source, p_data=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
+        p_source=p_source, p_target=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
     ).to(device)
     z = path.sample_conditioning_variable(1)
 
     with suppress_plot():
-        ax = visualize_conditional_probability_path(
+        ax = visualize_conditional_probability_path_overlaid(
             path=path, z=z, plot_limits=plot_limits
         )
         visualize_density(
@@ -54,7 +56,7 @@ def test_visualize_trajectories(mode: Literal["ode", "sde"]) -> None:
         num_modes=5, std=target_std, scale=target_scale
     ).to(device)
     path = GaussianConditionalProbabilityPath(
-        p_source=p_source, p_data=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
+        p_source=p_source, p_target=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
     ).to(device)
     z = path.sample_conditioning_variable(1)
     with suppress_plot():
@@ -62,7 +64,7 @@ def test_visualize_trajectories(mode: Literal["ode", "sde"]) -> None:
         visualize_density(
             p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[0]
         )
-        visualize_conditional_probability_path(
+        visualize_conditional_probability_path_overlaid(
             path=path, z=z, plot_limits=plot_limits, ax=axes[0]
         )
         visualize_density(

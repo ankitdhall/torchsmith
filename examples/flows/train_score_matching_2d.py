@@ -16,8 +16,12 @@ from torchsmith.models.flow.train.score_matching import ScoreFromVectorField
 from torchsmith.models.flow.visualize import visualize_density
 from torchsmith.models.flow.visualize import visualize_field_across_time_and_space
 from torchsmith.models.flow.visualize import visualize_generated_trajectories
-from torchsmith.models.flow.visualize import visualize_marginal_probability_path
-from torchsmith.models.flow.visualize import visualize_samples_from_learned_marginal
+from torchsmith.models.flow.visualize import (
+    visualize_marginal_probability_path_overlaid,
+)
+from torchsmith.models.flow.visualize import (
+    visualize_samples_from_learned_marginal_overlaid,
+)
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import get_device
 
@@ -34,7 +38,7 @@ p_data = GaussianMixture.symmetric_2d(
     scale=target_scale,
 ).to(device)
 path = GaussianConditionalProbabilityPath(
-    p_source=p_source, p_data=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
+    p_source=p_source, p_target=p_data, alpha=LinearAlpha(), beta=SquareRootBeta()
 ).to(device)
 
 NUM_EPOCHS = 1000
@@ -77,12 +81,12 @@ solver = EulerMaruyamaSolver(sde)
 
 fig, axes = plt.subplots(1, 3, figsize=(36, 12))
 visualize_density(p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[0])
-visualize_marginal_probability_path(
+visualize_marginal_probability_path_overlaid(
     path=path, plot_limits=plot_limits, num_samples=1000, ax=axes[0]
 )
 visualize_density(p_source=p_source, p_data=p_data, plot_limits=plot_limits, ax=axes[1])
 
-visualize_samples_from_learned_marginal(
+visualize_samples_from_learned_marginal_overlaid(
     path=path, plot_limits=plot_limits, solver=solver, ax=axes[1]
 )
 

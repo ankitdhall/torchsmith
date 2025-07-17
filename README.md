@@ -704,6 +704,7 @@ pre-commit run --all-files
 - [ ] Support LoRA and fine-tuning utilities
 - [ ] Find bigger GPUs and extend to larger datasets
 - [ ] Experiment with different positional embeddings
+- [ ] Replace .reshape with .view in the codebase; see [ref.](https://stackoverflow.com/questions/49643225/whats-the-difference-between-reshape-and-view-in-pytorch)
 
 
 ## Acknowledgements

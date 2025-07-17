@@ -1,6 +1,5 @@
 import torch
 
-from torchsmith.models.flow.data import Gaussian
 from torchsmith.models.flow.data import Sampleable
 from torchsmith.models.flow.paths.conditional_probability_path import (
     ConditionalProbabilityPath,
@@ -11,10 +10,9 @@ from torchsmith.models.flow.paths.schedulers import Beta
 
 class GaussianConditionalProbabilityPath(ConditionalProbabilityPath):
     def __init__(
-        self, p_source: Sampleable | None, p_data: Sampleable, alpha: Alpha, beta: Beta
+        self, p_source: Sampleable, p_target: Sampleable, alpha: Alpha, beta: Beta
     ) -> None:
-        p_source = p_source or Gaussian.isotropic(p_data.num_dims, 1.0)
-        super().__init__(p_source, p_data)
+        super().__init__(p_source, p_target)
         self.alpha = alpha
         self.beta = beta
 
