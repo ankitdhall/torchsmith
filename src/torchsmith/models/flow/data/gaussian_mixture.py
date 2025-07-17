@@ -2,11 +2,10 @@ import numpy as np
 import torch
 import torch.distributions as D
 
-from torchsmith.models.flow.data import Density
-from torchsmith.models.flow.data import Sampleable
+from torchsmith.models.flow.data.base import SampleableDensity
 
 
-class GaussianMixture(torch.nn.Module, Sampleable, Density):
+class GaussianMixture(torch.nn.Module, SampleableDensity):
     def __init__(
         self,
         means: torch.Tensor,  # num_modes x data_dim
@@ -27,6 +26,10 @@ class GaussianMixture(torch.nn.Module, Sampleable, Density):
             ),
             validate_args=False,
         )
+
+    @property
+    def num_dims(self) -> int:
+        return self.distribution.mean.dim()
 
     def log_density(self, x: torch.Tensor) -> torch.Tensor:
         return self.distribution.log_prob(x).view(-1, 1)

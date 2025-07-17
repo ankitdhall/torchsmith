@@ -22,3 +22,12 @@ class Sampleable(ABC):
     @abstractmethod
     def sample(self, num_samples: int) -> torch.Tensor:
         raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def num_dims(self) -> int:
+        raise NotImplementedError()
+
+
+class SampleableDensity(Sampleable, Density, ABC):
+    pass
