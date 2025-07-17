@@ -16,6 +16,7 @@ from torchsmith.models.flow.visualize import visualize_generated_trajectories
 from torchsmith.models.flow.visualize import (
     visualize_marginal_probability_path_overlaid,
 )
+from torchsmith.models.flow.visualize import visualize_samples_from_learned_marginal
 from torchsmith.models.flow.visualize import (
     visualize_samples_from_learned_marginal_overlaid,
 )
@@ -30,7 +31,7 @@ target_std = 1.0
 plot_limits = target_scale * 1.5
 p_source = Gaussian.isotropic(dim=2, std=1.0).to(device)
 p_data = GaussianMixture.symmetric_2d(
-    num_modes=5,
+    num_modes=3,
     std=target_std,
     scale=target_scale,
 ).to(device)
@@ -70,5 +71,11 @@ visualize_generated_trajectories(
     plot_limits=plot_limits,
     num_trajectories=200,
     ax=axes[2],
+)
+plt.show()
+
+
+visualize_samples_from_learned_marginal(
+    path=path, plot_limits=plot_limits, solver=solver
 )
 plt.show()

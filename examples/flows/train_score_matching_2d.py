@@ -19,6 +19,7 @@ from torchsmith.models.flow.visualize import visualize_generated_trajectories
 from torchsmith.models.flow.visualize import (
     visualize_marginal_probability_path_overlaid,
 )
+from torchsmith.models.flow.visualize import visualize_samples_from_learned_marginal
 from torchsmith.models.flow.visualize import (
     visualize_samples_from_learned_marginal_overlaid,
 )
@@ -97,6 +98,11 @@ visualize_generated_trajectories(
     plot_limits=plot_limits,
     num_trajectories=200,
     ax=axes[2],
+)
+plt.show()
+
+visualize_samples_from_learned_marginal(
+    path=path, plot_limits=plot_limits, solver=solver
 )
 plt.show()
 
