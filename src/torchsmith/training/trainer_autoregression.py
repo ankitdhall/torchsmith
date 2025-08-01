@@ -83,10 +83,14 @@ class TrainerAutoregression:
         save_every_n_epochs: int,
         generate_samples_fn: GenerateSamplesProtocol,
         show_plots: bool = True,
+        wandb_project_name: str | None = None,
         train_dataset_len: int | None = None,
         sample_every_n_epochs: int | None = None,
     ) -> None:
-        self.accelerator = Accelerator(log_with="wandb")
+        self.use_wandb = wandb_project_name is not None
+        self.accelerator = (
+            Accelerator(log_with="wandb") if self.use_wandb else Accelerator()
+        )
 
         self.train_dataset_len = train_dataset_len
         self.num_batches_per_epoch = data_handler.get_length("train")
@@ -135,11 +139,12 @@ class TrainerAutoregression:
 
             self.scheduler = self.accelerator.prepare(self.scheduler)
 
-        hps = {}
-        for config in [self.train_config]:
-            # TODO: add model config
-            hps[config.__class__.__name__] = asdict(config)
-        self.accelerator.init_trackers("mnist_images", config=hps)
+        if self.use_wandb:
+            hps = {}
+            for config in [self.train_config]:
+                # TODO: add model config
+                hps[config.__class__.__name__] = asdict(config)
+            self.accelerator.init_trackers(wandb_project_name, config=hps)
 
     def log_samples(self, samples: list[Any], epoch: int) -> None:
         sample_table = wandb.Table(columns=["sample", "sample_id", "epoch"])  # type: ignore
@@ -160,7 +165,8 @@ class TrainerAutoregression:
         train_losses, test_losses = [], []
         train_dataloader = self.data_handler.get_dataloader("train")
         test_dataloader = self.data_handler.get_dataloader("test")
-        wandb.watch(self.transformer, log="all", log_graph=True, log_freq=10)  # type: ignore
+        if self.use_wandb:
+            wandb.watch(self.transformer, log="all", log_graph=True, log_freq=10)  # type: ignore
         print(
             f"Training starting from epoch: {self._epoch} to epoch: "
             f"{self.train_config.num_epochs}"
@@ -226,7 +232,8 @@ class TrainerAutoregression:
                     decode=True,
                 )
                 samples = retval[1] if isinstance(retval, tuple) else retval
-                self.log_samples(samples, self._epoch + 1)
+                if self.use_wandb:
+                    self.log_samples(samples, self._epoch + 1)
 
         retval = self.generate_samples_fn(
             seq_len=self.seq_len,
@@ -236,7 +243,8 @@ class TrainerAutoregression:
         )
 
         samples = retval[1] if isinstance(retval, tuple) else retval
-        self.log_samples(samples, self._epoch + 1)
+        if self.use_wandb:
+            self.log_samples(samples, self._epoch + 1)
         print("Training complete!")
 
         return self.transformer, train_losses, test_losses, samples
