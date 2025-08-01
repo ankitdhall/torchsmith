@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '20 2 * * *'   # Runs nightly at 2:20 AM UTC
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
