@@ -119,7 +119,7 @@ def test_pos_enc_2d() -> None:
 
 
 @pytest.mark.parametrize("classifier_free_guidance_weight", [None, 5.0])
-def test_DiT_sample(classifier_free_guidance_weight) -> None:
+def test_DiT_sample(classifier_free_guidance_weight: float | None) -> None:
     num_classes = 10
     class_indices = [0, 1, 3]
     num_samples = 5

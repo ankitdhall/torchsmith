@@ -25,3 +25,6 @@ coverage*
 
 # Profiling
 profile*.html
+
+accelerate_config.yaml
+wandb

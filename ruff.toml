@@ -11,6 +11,8 @@ select = [
     "NPY", # numpy
     "PD", # pandas
     "RUF",
+    # TODO: Fix this and enable ANN
+    # "ANN", # flake8-annotations: checks for missing type hints
 ]
 
 ignore = [
