@@ -96,6 +96,6 @@ def generate_samples_fn_latent_cifar_10(
     _samples = samples.reshape(-1, *samples.shape[2:]).transpose(
         0, 3, 1, 2
     )  # (10*10, 3, 32, 32)
-    plot_samples(255 * _samples, num_rows=num_samples, show=True)
+    # plot_samples(255 * _samples, num_rows=num_samples, show=True)
 
     return samples

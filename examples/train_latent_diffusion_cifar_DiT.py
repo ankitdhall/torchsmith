@@ -1,3 +1,4 @@
+import os
 from functools import partial
 
 import numpy as np
@@ -16,19 +17,20 @@ from torchsmith.training.trainer_diffusion import DiffusionTrainer
 from torchsmith.utils.constants import DATA_DIR
 from torchsmith.utils.constants import EXPERIMENT_DIR
 from torchsmith.utils.constants import RANDOM_STATE
+from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import get_device
 from torchsmith.utils.pytorch import print_named_parameters
-from torchsmith.utils.pyutils import set_resource_limits
 
 n_jobs = 12
 
-set_resource_limits(n_jobs=n_jobs, maximum_memory=26)
+# TODO: revert
+# set_resource_limits(n_jobs=n_jobs, maximum_memory=26)
 
 device = get_device()
 train_config = TrainConfig(
     num_epochs=60,
-    batch_size=256,
+    batch_size=2048,  #  TODO: revert to 256
     num_workers=n_jobs,
     scheduler_config=CosineWarmupSchedulerConfig(
         num_warmup_steps=100,
@@ -103,6 +105,8 @@ test_dataset = DatasetImagesWithVAE(
     scale_factor=scale_factor,
 )
 
+# TODO: revert
+set_data_dir(os.environ.get("TORCHSMITH_DATA_DIR", DATA_DIR))
 experiment_dir = EXPERIMENT_DIR / "cifar_latent_diffusion"
 print(f"Saving experiment to: {experiment_dir}")
 
@@ -125,9 +129,10 @@ trainer = DiffusionTrainer(
         scale_factor=scale_factor,
     ),
     show_plots=True,
-    sample_every_n_epochs=1,
+    sample_every_n_epochs=5,  # TODO: revert
     save_dir=experiment_dir,
     save_every_n_epochs=5,
+    wandb_project_name="cifar_DiT",
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 plot_losses(train_losses, test_losses=test_losses, save_dir=experiment_dir, show=True)
