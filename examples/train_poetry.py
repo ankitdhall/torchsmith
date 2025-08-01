@@ -19,9 +19,6 @@ from torchsmith.utils.constants import EXPERIMENT_DIR
 from torchsmith.utils.constants import TOKENIZERS_DIR
 from torchsmith.utils.dtypes import GenerateSamplesProtocol
 from torchsmith.utils.plotting import plot_losses
-from torchsmith.utils.pytorch import get_device
-
-device = get_device()
 
 sequence_length = 128
 num_tokens_max = 1000
