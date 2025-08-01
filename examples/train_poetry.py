@@ -80,6 +80,7 @@ trainer = TrainerAutoregression(
     sample_every_n_epochs=1,
     save_dir=experiment_dir,
     save_every_n_epochs=5,
+    wandb_project_name="poetry",
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 
