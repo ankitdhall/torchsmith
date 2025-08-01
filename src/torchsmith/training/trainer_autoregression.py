@@ -163,8 +163,12 @@ class TrainerAutoregression:
     def train(self) -> tuple:
         self.transformer.train()
         train_losses, test_losses = [], []
-        train_dataloader = self.data_handler.get_dataloader("train")
-        test_dataloader = self.data_handler.get_dataloader("test")
+        train_dataloader = self.accelerator.prepare(
+            self.data_handler.get_dataloader("train")
+        )
+        test_dataloader = self.accelerator.prepare(
+            self.data_handler.get_dataloader("test")
+        )
         if self.use_wandb:
             wandb.watch(self.transformer, log="all", log_graph=True, log_freq=10)  # type: ignore
         print(
