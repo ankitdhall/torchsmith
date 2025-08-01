@@ -21,7 +21,7 @@ from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import print_named_parameters
 
-n_jobs = 4  # os.cpu_count()
+n_jobs = 6  # os.cpu_count()
 print(f"Number of available CPU cores: {n_jobs}")
 # TODO: revert
 # n_jobs = 12
@@ -29,7 +29,7 @@ print(f"Number of available CPU cores: {n_jobs}")
 
 train_config = TrainConfig(
     num_epochs=60,
-    batch_size=2048,  #  TODO: revert to 256
+    batch_size=1024,  #  TODO: revert to 256
     num_workers=n_jobs,
     scheduler_config=CosineWarmupSchedulerConfig(
         num_warmup_steps=100,
