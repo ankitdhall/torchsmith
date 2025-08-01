@@ -21,7 +21,7 @@ from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import print_named_parameters
 
-n_jobs = 4  # os.cpu_count()
+n_jobs = 6  # os.cpu_count()
 print(f"Number of available CPU cores: {n_jobs}")
 # TODO: revert
 # n_jobs = 12
