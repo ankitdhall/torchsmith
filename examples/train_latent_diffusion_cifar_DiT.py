@@ -19,15 +19,14 @@ from torchsmith.utils.constants import EXPERIMENT_DIR
 from torchsmith.utils.constants import RANDOM_STATE
 from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
-from torchsmith.utils.pytorch import get_device
 from torchsmith.utils.pytorch import print_named_parameters
 
-n_jobs = 12
-
+n_jobs = os.cpu_count()
+print(f"Number of available CPU cores: {n_jobs}")
 # TODO: revert
+# n_jobs = 12
 # set_resource_limits(n_jobs=n_jobs, maximum_memory=26)
 
-device = get_device()
 train_config = TrainConfig(
     num_epochs=60,
     batch_size=2048,  #  TODO: revert to 256
@@ -49,9 +48,10 @@ diffusion_transformer = DiT(
     num_classes=num_classes,
     cfg_dropout_prob=0.1,
 )
-model = DiffusionModel(input_shape=input_shape, model=diffusion_transformer)
+print("Downloading pre-trained VQ-VAE")
 vae = load_pretrain_vqvae()
 
+model = DiffusionModel(input_shape=input_shape, model=diffusion_transformer)
 print_named_parameters(diffusion_transformer)
 
 rng = np.random.default_rng(seed=RANDOM_STATE)
