@@ -56,6 +56,11 @@ print_named_parameters(diffusion_transformer)
 
 rng = np.random.default_rng(seed=RANDOM_STATE)
 
+print("Loading CIFAR-10 dataset ...")
+print(
+    f"Checking if exists: {DATA_DIR / 'cifar_dataset'!s}: "
+    f"{(DATA_DIR / 'cifar_dataset').exists()}"
+)
 train_dset = torchvision.datasets.CIFAR10(
     DATA_DIR / "cifar_dataset",
     transform=torchvision.transforms.ToTensor(),
