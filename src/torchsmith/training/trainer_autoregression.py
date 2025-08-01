@@ -50,7 +50,8 @@ def loop_AR(
 
         # Compute prediction and loss
         pred = model(X)
-        loss = loss_fn(pred[:, :-1], X[:, 1:])
+        with accelerator.autocast():
+            loss = loss_fn(pred[:, :-1], X[:, 1:])
 
         losses_per_batch.append(loss.item())
         loss_total += loss.item() * batch_size

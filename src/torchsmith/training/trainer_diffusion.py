@@ -57,7 +57,8 @@ def loop_diffusion(
             for k, v in kwargs.items()
         }
         y_hat, y = model(X, **kwargs)
-        loss = loss_fn(y_hat, y)
+        with accelerator.autocast():
+            loss = loss_fn(y_hat, y)
 
         losses_per_batch.append(loss.item())
         loss_total += loss.item() * batch_size
