@@ -65,7 +65,7 @@ def test_train_gpt2_text(tmp_path: Path) -> None:
         save_every_n_epochs=5,
     )
     transformer, train_losses, test_losses, samples = trainer.train()
-    print(tokenizer.decode_batch(samples.tolist()))
+    print(samples)
     plot_losses(train_losses, test_losses=test_losses, save_dir=tmp_path)
 
 
@@ -109,7 +109,7 @@ def test_train_gpt2_text_lyrics(tmp_path: Path) -> None:
         save_every_n_epochs=5,
     )
     transformer, train_losses, test_losses, samples = trainer.train()
-    print(tokenizer.decode_batch(samples.tolist()))
+    print(samples)
 
 
 def test_train_gpt2_text_save_load(tmp_path: Path) -> None:
