@@ -29,7 +29,7 @@ print(f"Number of available CPU cores: {n_jobs}")
 
 train_config = TrainConfig(
     num_epochs=60,
-    batch_size=1024,  #  TODO: revert to 256
+    batch_size=512,  #  TODO: revert to 256
     num_workers=n_jobs,
     scheduler_config=CosineWarmupSchedulerConfig(
         num_warmup_steps=100,
