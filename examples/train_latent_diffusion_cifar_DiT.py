@@ -21,7 +21,7 @@ from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import print_named_parameters
 
-n_jobs = 6  # os.cpu_count()
+n_jobs = 12  # os.cpu_count()
 print(f"Number of available CPU cores: {n_jobs}")
 # TODO: revert
 # n_jobs = 12
@@ -133,7 +133,7 @@ trainer = DiffusionTrainer(
         std=std,
         scale_factor=scale_factor,
     ),
-    show_plots=True,
+    show_plots=False,
     sample_every_n_epochs=5,  # TODO: revert
     save_dir=experiment_dir,
     save_every_n_epochs=5,

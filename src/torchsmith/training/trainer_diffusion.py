@@ -8,6 +8,7 @@ import torch
 from accelerate import Accelerator
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
+from torchvision.utils import make_grid
 from tqdm import tqdm
 
 import wandb
@@ -148,7 +149,16 @@ class DiffusionTrainer:
             if isinstance(sample, str):
                 sample_table.add_data(sample, sample_id, epoch)
             elif isinstance(sample, np.ndarray):
-                sample_table.add_data(wandb.Image(sample), sample_id, epoch)  # type: ignore
+                if sample.ndim == 3 or sample.ndim == 2:
+                    sample_table.add_data(wandb.Image(sample), sample_id, epoch)  # type: ignore
+                elif sample.ndim == 4:
+                    b, c, h, w = sample.shape
+                    grid_img = make_grid(torch.tensor(sample), nrow=b // 10)
+                    sample_table.add_data(wandb.Image(grid_img), sample_id, epoch)  # type: ignore
+                else:
+                    raise NotImplementedError(
+                        f"Unsupported sample shape: {sample.shape}"
+                    )
             else:
                 raise TypeError(
                     f"Unsupported sample type: '{type(sample)}'. "
@@ -238,11 +248,11 @@ class DiffusionTrainer:
             ):
                 samples = self.generate_samples_fn(self.model)
                 if self.use_wandb:
-                    self.log_samples(samples, self._epoch + 1)
+                    self.log_samples([samples], self._epoch + 1)
 
         samples = self.generate_samples_fn(self.model)
         if self.use_wandb:
-            self.log_samples(samples, self._epoch + 1)
+            self.log_samples([samples], self._epoch + 1)
 
         print("Training complete!")
         return self.model, train_losses, test_losses, samples

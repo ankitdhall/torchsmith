@@ -98,4 +98,6 @@ def generate_samples_fn_latent_cifar_10(
     )  # (10*10, 3, 32, 32)
     # plot_samples(255 * _samples, num_rows=num_samples, show=True)
 
-    return samples
+    # TODO: there might be places where this breaks as initially we were returning
+    #  `samples` instead of `_samples`
+    return _samples
