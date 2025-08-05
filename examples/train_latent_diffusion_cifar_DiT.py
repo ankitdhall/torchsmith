@@ -10,6 +10,8 @@ from torchsmith.models.diffusion import DiT
 from torchsmith.models.diffusion import generate_samples_fn_latent_cifar_10
 from torchsmith.models.external.cifar_10 import load_pretrain_vqvae
 from torchsmith.training.config import TrainConfig
+from torchsmith.training.config import WandbConfig
+from torchsmith.training.config import WandbWatchConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.losses import mse
 from torchsmith.training.scheduler import CosineWarmupSchedulerConfig
@@ -137,7 +139,7 @@ trainer = DiffusionTrainer(
     sample_every_n_epochs=5,  # TODO: revert
     save_dir=experiment_dir,
     save_every_n_epochs=5,
-    wandb_project_name="cifar_DiT",
+    wandb_config=WandbConfig(project_name="cifar_DiT", watch_config=WandbWatchConfig()),
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 plot_losses(train_losses, test_losses=test_losses, save_dir=experiment_dir, show=True)
