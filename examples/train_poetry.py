@@ -12,6 +12,8 @@ from torchsmith.tokenizers import StringTokenizer
 from torchsmith.tokenizers.text_tokenizer import generate_samples_text
 from torchsmith.training.config import GPT2Config
 from torchsmith.training.config import TrainConfig
+from torchsmith.training.config import WandbConfig
+from torchsmith.training.config import WandbWatchConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.losses import cross_entropy
 from torchsmith.training.trainer_autoregression import TrainerAutoregression
@@ -80,7 +82,7 @@ trainer = TrainerAutoregression(
     sample_every_n_epochs=1,
     save_dir=experiment_dir,
     save_every_n_epochs=5,
-    wandb_project_name="poetry",
+    wandb_config=WandbConfig(project_name="poetry", watch_config=WandbWatchConfig()),
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 
