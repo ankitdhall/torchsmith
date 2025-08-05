@@ -53,8 +53,7 @@ print("\t\tNumber of tokens:", len(tokenizer))
 experiment_dir = EXPERIMENT_DIR / "poetry"
 print(f"Saving experiment to: {experiment_dir}")
 
-# TODO: revert to num_epochs=100 batch_size=512
-train_config = TrainConfig(num_epochs=50, batch_size=1024, num_workers=12)
+train_config = TrainConfig(num_epochs=100, batch_size=512, num_workers=12)
 train_dataset = PoetryDataset(train_df, tokenizer, sequence_length=sequence_length)
 test_dataset = PoetryDataset(test_df, tokenizer, sequence_length=sequence_length)
 

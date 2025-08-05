@@ -23,15 +23,12 @@ from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
 from torchsmith.utils.pytorch import print_named_parameters
 
-n_jobs = 12  # os.cpu_count()
+n_jobs = 12
 print(f"Number of available CPU cores: {n_jobs}")
-# TODO: revert
-# n_jobs = 12
-# set_resource_limits(n_jobs=n_jobs, maximum_memory=26)
 
 train_config = TrainConfig(
     num_epochs=60,
-    batch_size=256,  #  TODO: revert to 256
+    batch_size=256,
     num_workers=n_jobs,
     scheduler_config=CosineWarmupSchedulerConfig(
         num_warmup_steps=100,
@@ -112,7 +109,7 @@ test_dataset = DatasetImagesWithVAE(
     scale_factor=scale_factor,
 )
 
-# TODO: revert
+
 set_data_dir(os.environ.get("TORCHSMITH_DATA_DIR", DATA_DIR))
 experiment_dir = EXPERIMENT_DIR / "cifar_latent_diffusion"
 print(f"Saving experiment to: {experiment_dir}")
@@ -136,7 +133,7 @@ trainer = DiffusionTrainer(
         scale_factor=scale_factor,
     ),
     show_plots=False,
-    sample_every_n_epochs=5,  # TODO: revert
+    sample_every_n_epochs=5,
     save_dir=experiment_dir,
     save_every_n_epochs=5,
     wandb_config=WandbConfig(project_name="cifar_DiT", watch_config=WandbWatchConfig()),
