@@ -147,7 +147,7 @@ def test_DiT_sample(classifier_free_guidance_weight: float | None) -> None:
             scale_factor=1.2963932,
             cfg_weight=classifier_free_guidance_weight,
         )
-    assert samples.shape == (len(class_indices), num_samples, 32, 32, 3)
+    assert samples.shape == (len(class_indices) * num_samples, 3, 32, 32)
 
 
 def test_DiT_sample_from_loaded_model() -> None:
