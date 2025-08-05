@@ -65,7 +65,7 @@ def test_train_gpt2_text(tmp_path: Path) -> None:
         save_every_n_epochs=5,
     )
     transformer, train_losses, test_losses, samples = trainer.train()
-    print(tokenizer.decode_batch(samples.tolist()))
+    print(samples)
     plot_losses(train_losses, test_losses=test_losses, save_dir=tmp_path)
 
 
@@ -109,7 +109,7 @@ def test_train_gpt2_text_lyrics(tmp_path: Path) -> None:
         save_every_n_epochs=5,
     )
     transformer, train_losses, test_losses, samples = trainer.train()
-    print(tokenizer.decode_batch(samples.tolist()))
+    print(samples)
 
 
 def test_train_gpt2_text_save_load(tmp_path: Path) -> None:
@@ -150,7 +150,7 @@ def test_train_gpt2_text_save_load(tmp_path: Path) -> None:
         save_every_n_epochs=5,
     )
     transformer, train_losses, test_losses, samples = trainer.train()
-    # plot_losses(train_losses, test_losses)
+    # plot_losses(train_losses, test_losses=test_losses, show=True)
 
     epochs_sorted = sorted(
         [
@@ -188,6 +188,6 @@ def test_train_gpt2_text_save_load(tmp_path: Path) -> None:
     ) = trainer_10_epochs.train()
 
     # print(tokenizer.decode_batch(samples.tolist()))
-    # plot_losses(train_losses_10_epochs, test_losses_10_epochs)
+    # plot_losses(train_losses_10_epochs, test_losses=test_losses_10_epochs, show=True)
     np.testing.assert_allclose(train_losses[-1], train_losses_10_epochs[-1], atol=0.2)
     np.testing.assert_allclose(test_losses[-1], test_losses_10_epochs[-1], atol=0.2)

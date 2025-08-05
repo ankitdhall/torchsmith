@@ -133,34 +133,38 @@ def generate_samples_image(
     tokenizer: VQVAEImageTokenizer,
     transformer: GPT2Decoder,
     decode: bool,
+    show: bool = False,
     num_samples: int = 9,
     postprocess_fn: Callable | None = None,  # TODO: improve typing
-) -> torch.Tensor:
+) -> tuple[torch.Tensor, list[np.ndarray]]:
     transformer.eval()
     prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
     exclude_indices = {tokenizer.bos_id, tokenizer.eos_id}
     samples, _ = transformer.sample(
         num_samples, seq_len=seq_len, prefix=prefix, exclude_indices=exclude_indices
     )
-    if decode:
-        # Skip the last token as it corresponds to what the model predicts after
-        # the last pixel in the image. This is not required during decoding.
-        # Skip the first token as it corresponds to the BOS token.
-        # This is not required during decoding.
-        decoded_images = list(
-            tokenizer.decode_batch(iter(sample[1:] for sample in samples.tolist()))
-        )
-        decoded_images = (
-            list(postprocess_fn(np.concatenate(decoded_images)))
-            if postprocess_fn is not None
-            else decoded_images
-        )
+
+    # Skip the last token as it corresponds to what the model predicts after
+    # the last pixel in the image. This is not required during decoding.
+    # Skip the first token as it corresponds to the BOS token.
+    # This is not required during decoding.
+    decoded_images = list(
+        tokenizer.decode_batch(iter(sample[1:] for sample in samples.tolist()))
+    )
+    decoded_images = (
+        list(postprocess_fn(np.concatenate(decoded_images)))
+        if postprocess_fn is not None
+        else decoded_images
+    )
+    if show:
         plot_images(
             decoded_images,
             titles=[f"Sample {index}" for index in range(num_samples)],
             max_cols=int(num_samples**0.5),
         )
-    return samples
+    return samples, [
+        np.floor(img.astype("float32") / 3 * 255).astype(int) for img in decoded_images
+    ]
 
 
 def generate_samples_image_v2(

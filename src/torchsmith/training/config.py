@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Literal
 
 from torchsmith.training.optimizer import AdamConfig
 from torchsmith.training.optimizer import OptimizerConfig
@@ -26,3 +27,17 @@ class TrainConfig:
         default_factory=CosineWarmupSchedulerConfig
     )
     # TODO: include scheduler and optimizer creation as part of this class?
+
+
+@dataclasses.dataclass(frozen=True)
+class WandbWatchConfig:
+    log: Literal["gradients", "parameters", "all"] | None = "gradients"
+    log_graph: bool = False
+    log_freq: int = 1000
+
+
+@dataclasses.dataclass(frozen=True)
+class WandbConfig:
+    project_name: str
+    watch_config: WandbWatchConfig | None
+    config: dict | None = None

@@ -12,6 +12,8 @@ from torchsmith.tokenizers import StringTokenizer
 from torchsmith.tokenizers.text_tokenizer import generate_samples_text
 from torchsmith.training.config import GPT2Config
 from torchsmith.training.config import TrainConfig
+from torchsmith.training.config import WandbConfig
+from torchsmith.training.config import WandbWatchConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.losses import cross_entropy
 from torchsmith.training.trainer_autoregression import TrainerAutoregression
@@ -19,9 +21,6 @@ from torchsmith.utils.constants import EXPERIMENT_DIR
 from torchsmith.utils.constants import TOKENIZERS_DIR
 from torchsmith.utils.dtypes import GenerateSamplesProtocol
 from torchsmith.utils.plotting import plot_losses
-from torchsmith.utils.pytorch import get_device
-
-device = get_device()
 
 sequence_length = 128
 num_tokens_max = 1000
@@ -78,15 +77,16 @@ trainer = TrainerAutoregression(
     loss_fn=cross_entropy,
     sequence_length=transformer_config.seq_len,
     generate_samples_fn=cast(GenerateSamplesProtocol, generate_samples_text),
-    show_plots=True,
+    show_plots=False,
     sample_every_n_epochs=1,
     save_dir=experiment_dir,
     save_every_n_epochs=5,
+    wandb_config=WandbConfig(project_name="poetry", watch_config=WandbWatchConfig()),
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 
-for sample in tokenizer.decode_batch(iter(samples.tolist())):
+for sample in samples:
     print("------ START ------")
-    print("".join(sample))
+    print(sample)
     print("------- END -------")
 plot_losses(train_losses, test_losses=test_losses, save_dir=experiment_dir, show=True)

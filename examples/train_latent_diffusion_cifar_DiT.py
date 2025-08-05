@@ -1,3 +1,4 @@
+import os
 from functools import partial
 
 import numpy as np
@@ -9,6 +10,8 @@ from torchsmith.models.diffusion import DiT
 from torchsmith.models.diffusion import generate_samples_fn_latent_cifar_10
 from torchsmith.models.external.cifar_10 import load_pretrain_vqvae
 from torchsmith.training.config import TrainConfig
+from torchsmith.training.config import WandbConfig
+from torchsmith.training.config import WandbWatchConfig
 from torchsmith.training.data import DataHandler
 from torchsmith.training.losses import mse
 from torchsmith.training.scheduler import CosineWarmupSchedulerConfig
@@ -16,16 +19,13 @@ from torchsmith.training.trainer_diffusion import DiffusionTrainer
 from torchsmith.utils.constants import DATA_DIR
 from torchsmith.utils.constants import EXPERIMENT_DIR
 from torchsmith.utils.constants import RANDOM_STATE
+from torchsmith.utils.constants import set_data_dir
 from torchsmith.utils.plotting import plot_losses
-from torchsmith.utils.pytorch import get_device
 from torchsmith.utils.pytorch import print_named_parameters
-from torchsmith.utils.pyutils import set_resource_limits
 
 n_jobs = 12
+print(f"Number of available CPU cores: {n_jobs}")
 
-set_resource_limits(n_jobs=n_jobs, maximum_memory=26)
-
-device = get_device()
 train_config = TrainConfig(
     num_epochs=60,
     batch_size=256,
@@ -47,13 +47,19 @@ diffusion_transformer = DiT(
     num_classes=num_classes,
     cfg_dropout_prob=0.1,
 )
-model = DiffusionModel(input_shape=input_shape, model=diffusion_transformer)
+print("Downloading pre-trained VQ-VAE")
 vae = load_pretrain_vqvae()
 
+model = DiffusionModel(input_shape=input_shape, model=diffusion_transformer)
 print_named_parameters(diffusion_transformer)
 
 rng = np.random.default_rng(seed=RANDOM_STATE)
 
+print("Loading CIFAR-10 dataset ...")
+print(
+    f"Checking if exists: {DATA_DIR / 'cifar_dataset'!s}: "
+    f"{(DATA_DIR / 'cifar_dataset').exists()}"
+)
 train_dset = torchvision.datasets.CIFAR10(
     DATA_DIR / "cifar_dataset",
     transform=torchvision.transforms.ToTensor(),
@@ -103,6 +109,8 @@ test_dataset = DatasetImagesWithVAE(
     scale_factor=scale_factor,
 )
 
+
+set_data_dir(os.environ.get("TORCHSMITH_DATA_DIR", DATA_DIR))
 experiment_dir = EXPERIMENT_DIR / "cifar_latent_diffusion"
 print(f"Saving experiment to: {experiment_dir}")
 
@@ -124,10 +132,11 @@ trainer = DiffusionTrainer(
         std=std,
         scale_factor=scale_factor,
     ),
-    show_plots=True,
-    sample_every_n_epochs=1,
+    show_plots=False,
+    sample_every_n_epochs=5,
     save_dir=experiment_dir,
     save_every_n_epochs=5,
+    wandb_config=WandbConfig(project_name="cifar_DiT", watch_config=WandbWatchConfig()),
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 plot_losses(train_losses, test_losses=test_losses, save_dir=experiment_dir, show=True)

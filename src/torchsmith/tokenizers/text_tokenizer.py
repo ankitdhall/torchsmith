@@ -101,18 +101,21 @@ def generate_samples_text(
     tokenizer: TextTokenizer,
     transformer: GPT2Decoder,
     decode: bool,
-) -> torch.Tensor:
+) -> tuple[torch.Tensor, list[str]]:
     transformer.eval()
     num_samples = 5
     prefix = torch.full((num_samples, 1), tokenizer.bos_id, device=device, dtype=int)
     samples, _ = transformer.sample(num_samples, seq_len=seq_len, prefix=prefix)
-    if decode:
-        decoded_text = list(tokenizer.decode_batch(iter(samples.tolist())))
-        for index, text in enumerate(decoded_text):
-            print(f"------ Start of Sample {index} ------")
-            print("".join(text))
-            print(f"------ End of Sample {index} ------")
-    return samples
+
+    decoded_strings = []
+    decoded_text = list(tokenizer.decode_batch(iter(samples.tolist())))
+    for index, text in enumerate(decoded_text):
+        s = "".join(text)
+        decoded_strings.append(s)
+        print(f"------ Start of Sample {index} ------")
+        print(s)
+        print(f"------ End of Sample {index} ------")
+    return samples, decoded_strings
 
 
 def sample_completion_text(

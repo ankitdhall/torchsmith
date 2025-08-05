@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
 
 REPO_DIR = Path(__file__).resolve().parent.parent.parent.parent
-DATA_DIR = REPO_DIR / "data"
+DATA_DIR = Path(os.environ.get("TORCHSMITH_DATA_DIR", REPO_DIR / "data"))
 TOKENIZERS_DIR = DATA_DIR / "tokenizers"
 PROFILING_DIR = DATA_DIR / "profiling"
 EXPERIMENT_DIR = DATA_DIR / "experiments"

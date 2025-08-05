@@ -193,8 +193,8 @@ trainer = TrainerAutoregression(
 )
 transformer, train_losses, test_losses, samples = trainer.train()
 
-for sample in tokenizer.decode_batch(iter(samples.tolist())):
+for sample in samples:
     print("------ START ------")
-    print("".join(sample))
+    print(sample)
     print("------- END -------")
 plot_losses(train_losses, test_losses=test_losses, save_dir=experiment_dir, show=True)

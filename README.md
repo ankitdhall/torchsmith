@@ -714,6 +714,15 @@ For example:
 python examples/train_eminem.py
 ```
 
+Or if you want to train on multiple GPUs, use `accelerate`:
+```bash
+accelerate launch torchsmith/examples/train_latent_diffusion_cifar_DiT.py --mixed_precision fp16
+```
+
+```bash
+accelerate launch torchsmith/examples/train_poetry.py
+```
+
 ### 🎨 Generating Samples
 
 ```python
@@ -798,7 +807,9 @@ pre-commit run --all-files
 - [x] Flow matching
 - [ ] Experiment with VQ-GANs
 - [ ] Support LoRA and fine-tuning utilities
-- [ ] Find bigger GPUs and extend to larger datasets
+- [x] Add accelerate support to train on bigger GPUs
+- [x] Add wandb support
+- [ ] Train on larger datasets
 - [ ] Experiment with different positional embeddings
 - [ ] Replace .reshape with .view in the codebase; see [ref.](https://stackoverflow.com/questions/49643225/whats-the-difference-between-reshape-and-view-in-pytorch)
 

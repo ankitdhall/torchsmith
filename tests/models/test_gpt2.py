@@ -124,7 +124,7 @@ def test_gpt2_colored_mnist_sample() -> None:
     transformer = GPT2Decoder.load_model(path_to_weights).to(device)
     sequence_length = transformer.seq_len
     with suppress_plot():
-        samples = generate_samples_image(
+        samples, decoded_samples = generate_samples_image(
             seq_len=sequence_length,
             tokenizer=tokenizer,
             transformer=transformer,
