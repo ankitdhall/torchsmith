@@ -28,3 +28,4 @@ profile*.html
 
 accelerate_config.yaml
 wandb
+modal_scripts
