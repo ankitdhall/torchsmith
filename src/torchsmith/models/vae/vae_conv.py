@@ -79,7 +79,7 @@ class DecoderConv(nn.Module):
         self.model = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        fc_output = self.fc(x).reshape(-1, *self.decoder_input_shape)
+        fc_output = self.fc(x).view(-1, *self.decoder_input_shape)
         return self.model(fc_output)
 
 

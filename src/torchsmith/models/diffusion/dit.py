@@ -33,10 +33,10 @@ class PositionalEncoding2D(torch.nn.Module):
         grid = torch.meshgrid(position_w, position_h)  # Row-major ordering.
         grid = torch.stack(grid, dim=0)  # (2, grid_size, grid_size)
         encoding_w = self.get_1d_encoding(
-            num_dims=dim_model // 2, positions=grid[0].reshape(-1)
+            num_dims=dim_model // 2, positions=grid[0].view(-1)
         )
         encoding_h = self.get_1d_encoding(
-            num_dims=dim_model // 2, positions=grid[1].reshape(-1)
+            num_dims=dim_model // 2, positions=grid[1].view(-1)
         )
         self.register_buffer(
             "encoding", torch.cat([encoding_w, encoding_h], dim=-1).to(device)
@@ -44,7 +44,7 @@ class PositionalEncoding2D(torch.nn.Module):
 
     def get_1d_encoding(self, num_dims: int, positions: torch.Tensor) -> torch.Tensor:
         assert len(positions.shape) == 1
-        positions = positions.reshape((-1, 1))  # positions: (num_positions, 1)
+        positions = positions.view((-1, 1))  # positions: (num_positions, 1)
         half_dim = num_dims // 2
         i = torch.arange(0, half_dim).float()
         denominator = torch.pow(self.max_len, (i / half_dim))  # (dim_model/2,)
@@ -74,13 +74,15 @@ def get_2d_sincos_pos_embed_from_grid(embed_dim: int, grid) -> torch.Tensor:
     return emb
 
 
-def get_1d_sincos_pos_embed_from_grid(embed_dim: int, pos) -> torch.Tensor:
+def get_1d_sincos_pos_embed_from_grid(
+    embed_dim: int, pos: torch.Tensor
+) -> torch.Tensor:
     assert embed_dim % 2 == 0
     omega = torch.arange(embed_dim // 2, dtype=torch.float64)
     omega /= embed_dim / 2.0
     omega = 1.0 / 10000**omega  # (D/2,)
 
-    pos = pos.reshape(-1)  # (M,)
+    pos = pos.view(-1)  # (M,)
     out = torch.einsum("m,d->md", pos, omega)  # (M, D/2), outer product
 
     emb_sin = torch.sin(out)  # (M, D/2)
@@ -96,7 +98,7 @@ def get_2d_sincos_pos_embed(embed_dim: int, grid_size: int) -> torch.Tensor:
     grid = torch.meshgrid(grid_w, grid_h)  # here w goes first
     grid = torch.stack(grid, dim=0)
 
-    grid = grid.reshape([2, 1, grid_size, grid_size])
+    grid = grid.view([2, 1, grid_size, grid_size])
     pos_embed = get_2d_sincos_pos_embed_from_grid(embed_dim, grid)
     return pos_embed
 
@@ -298,7 +300,7 @@ class DiT(torch.nn.Module):
             x
         )  # (B, C, H, W) -> (B, D, H // patch_size, W // patch_size)
         batch_size = x.shape[0]
-        x = x.reshape(batch_size, self.dim_model, -1)  # (B, D, num_patches)
+        x = x.view(batch_size, self.dim_model, -1)  # (B, D, num_patches)
         x = x.permute(0, 2, 1)  # (B, D, num_patches) -> (B, num_patches, D)
         x = self.positional_embeddings(x)
 

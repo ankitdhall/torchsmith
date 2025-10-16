@@ -38,7 +38,7 @@ class MLP(nn.Module):
         self.model = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.reshape(-1, self.input_dim)
+        x = x.view(-1, self.input_dim)
         output = self.model(x)
         return output.view(-1, *self.output_shape)
 
