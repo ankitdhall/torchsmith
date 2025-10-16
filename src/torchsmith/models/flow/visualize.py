@@ -413,8 +413,8 @@ def visualize_field_across_time_and_space(
     xs = torch.linspace(-plot_limits, plot_limits, num_bins).to(device)
     ys = torch.linspace(-plot_limits, plot_limits, num_bins).to(device)
     xx, yy = torch.meshgrid(xs, ys)
-    xx = xx.reshape(-1, 1)
-    yy = yy.reshape(-1, 1)
+    xx = xx.view(-1, 1)
+    yy = yy.view(-1, 1)
     xy = torch.cat([xx, yy], dim=-1)
 
     for t_index in range(num_marginals):

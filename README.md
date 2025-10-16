@@ -811,7 +811,7 @@ pre-commit run --all-files
 - [x] Add wandb support
 - [ ] Train on larger datasets
 - [ ] Experiment with different positional embeddings
-- [ ] Replace .reshape with .view in the codebase; see [ref.](https://stackoverflow.com/questions/49643225/whats-the-difference-between-reshape-and-view-in-pytorch)
+- [x] Replace .reshape with .view in the codebase; see [ref.](https://stackoverflow.com/questions/49643225/whats-the-difference-between-reshape-and-view-in-pytorch)
 
 
 ## Acknowledgements

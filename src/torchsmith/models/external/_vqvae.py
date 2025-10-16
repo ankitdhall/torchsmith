@@ -7,6 +7,7 @@ Taken with import modifications to be able to load the colored MNIST pre-trained
 import numpy as np
 import torch
 import torch.nn as nn
+
 from torchsmith.models.external._decoder import Decoder
 from torchsmith.models.external._encoder import Encoder
 from torchsmith.models.external._quantizer import VectorQuantizer
@@ -42,7 +43,7 @@ class VQVAE(nn.Module):
         self.n_embeddings = n_embeddings
         self.embedding_dim = embedding_dim
 
-    def quantize(self, x: np.ndarray) -> np.ndarray:
+    def quantize(self, x: np.ndarray) -> torch.Tensor:
         """Quantize an image x.
 
         Args:

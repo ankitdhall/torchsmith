@@ -26,9 +26,7 @@ class VQVAEMNIST(BaseVQVAE):
         self.vqvae = load_pretrain_vqvae().eval().to(device)
 
     def encode_to_indices(self, x: torch.Tensor) -> torch.Tensor:
-        return cast(
-            torch.Tensor, self.vqvae.quantize(x.numpy()).reshape(x.shape[0], -1)
-        )
+        return cast(torch.Tensor, self.vqvae.quantize(x.numpy()).view(x.shape[0], -1))
 
     def decode_from_indices(self, x: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():

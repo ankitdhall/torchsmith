@@ -28,7 +28,7 @@ class DiffusionModel(torch.nn.Module):
     def sample_noise(self, num_samples: int) -> torch.Tensor:
         noise = self.normal_distribution.sample((num_samples,)).to(device=device)
         if isinstance(self.input_shape, tuple):
-            noise = noise.reshape((num_samples, *self.input_shape))
+            noise = noise.view((num_samples, *self.input_shape))
         return noise
 
     @staticmethod
