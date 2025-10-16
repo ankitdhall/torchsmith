@@ -40,7 +40,7 @@ class MLP(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.reshape(-1, self.input_dim)
         output = self.model(x)
-        return output.reshape(-1, *self.output_shape)
+        return output.view(-1, *self.output_shape)
 
 
 @add_save_load

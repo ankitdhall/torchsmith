@@ -46,7 +46,7 @@ def plot_density(
     y = torch.linspace(-scale, scale, bins).to(device)
     X, Y = torch.meshgrid(x, y)
     xy = torch.stack([X.reshape(-1), Y.reshape(-1)], dim=-1)
-    log_density = density.log_density(xy).reshape(bins, bins).T
+    log_density = density.log_density(xy).view(bins, bins).T
     ax.imshow(
         log_density.cpu(),
         extent=(-scale, scale, -scale, scale),
